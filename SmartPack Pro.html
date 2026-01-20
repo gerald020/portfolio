@@ -22,7 +22,7 @@
             display: flex;
             height: 100vh;
             background-color: var(--bg-canvas);
-            overflow: hidden;
+            overflow: hidden; /* 防止整體頁面滾動 */
         }
 
         /* 側邊欄設計 */
@@ -35,6 +35,10 @@
             padding: 24px 20px;
             box-shadow: 5px 0 25px rgba(0,0,0,0.15);
             z-index: 20;
+            overflow-y: auto; /* 允許垂直滾動 */
+            /* 隱藏滾動條但保留功能 */
+            scrollbar-width: thin; 
+            scrollbar-color: #334155 transparent;
         }
 
         .logo {
@@ -45,13 +49,12 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-shrink: 0; /* 防止 logo 被壓縮 */
         }
 
         .logo-dot { width: 10px; height: 10px; background: var(--accent-blue); border-radius: 2px; }
 
-        .control-group {
-            margin-bottom: 24px;
-        }
+        .control-group { margin-bottom: 24px; flex-shrink: 0; }
 
         .group-header {
             font-size: 0.7rem;
@@ -70,16 +73,8 @@
             gap: 10px;
         }
 
-        .input-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .input-item label {
-            font-size: 0.75rem;
-            color: #cbd5e1;
-        }
+        .input-item { display: flex; flex-direction: column; gap: 4px; }
+        .input-item label { font-size: 0.75rem; color: #cbd5e1; }
 
         input {
             background: #1e293b;
@@ -100,7 +95,7 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
-        /* 新增：體積重顯示區塊 */
+        /* 體積重顯示區塊 */
         .vol-info {
             margin-top: 12px;
             background: rgba(255, 255, 255, 0.05);
@@ -117,14 +112,8 @@
             margin-bottom: 4px;
             color: #94a3b8;
         }
-
         .vol-row:last-child { margin-bottom: 0; }
-
-        .vol-val {
-            font-family: 'Roboto Mono', monospace;
-            color: var(--accent-blue);
-            font-weight: 600;
-        }
+        .vol-val { font-family: 'Roboto Mono', monospace; color: var(--accent-blue); font-weight: 600; }
 
         button {
             background: var(--accent-blue);
@@ -135,9 +124,11 @@
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
-            margin-top: auto;
+            margin-top: auto; /* 推到底部 */
+            margin-bottom: 10px; /* 預留底部空間 */
             transition: transform 0.1s, background 0.2s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            flex-shrink: 0;
         }
 
         button:hover { background: #2563eb; }
@@ -151,6 +142,7 @@
             flex-direction: column;
             box-shadow: inset 10px 0 20px -5px rgba(0,0,0,0.05);
             background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+            overflow: hidden; /* 防止畫布撐開 */
         }
 
         /* 數據浮層 */
@@ -161,6 +153,7 @@
             display: flex;
             gap: 16px;
             pointer-events: none;
+            z-index: 10;
         }
 
         .metric-card {
@@ -177,6 +170,61 @@
         .metric-value { font-size: 1.4rem; font-weight: 700; color: var(--brand-primary); }
 
         #canvas-wrap { flex-grow: 1; width: 100%; height: 100%; }
+
+        /* =========================================
+           針對手機屏幕的優化 (Media Query)
+           ========================================= */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column; /* 改為垂直排列 */
+            }
+
+            /* 主視圖 (3D) 在手機上排在第一位 */
+            #main-container {
+                order: 1; 
+                height: 55vh; /* 佔據屏幕上部 55% */
+                flex-grow: 0; /* 固定高度，不自動伸展 */
+                box-shadow: inset 0 -10px 20px -5px rgba(0,0,0,0.05);
+            }
+
+            /* 側邊欄 (輸入) 在手機上排在第二位 */
+            #sidebar {
+                order: 2;
+                width: 100%; /* 寬度全屏 */
+                height: 45vh; /* 佔據屏幕下部 45% */
+                box-shadow: 0 -5px 25px rgba(0,0,0,0.2); /* 陰影改為向上 */
+                padding: 20px;
+                box-sizing: border-box;
+                border-top-left-radius: 20px; /* 增加一點圓角設計 */
+                border-top-right-radius: 20px;
+            }
+
+            /* 手機上調整數據浮層的位置和大小 */
+            #data-overlay {
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                justify-content: center; /* 居中 */
+                gap: 10px;
+            }
+
+            .metric-card {
+                min-width: auto;
+                flex: 1; /* 平分寬度 */
+                padding: 10px 15px;
+                text-align: center;
+            }
+            
+            .metric-value {
+                font-size: 1.2rem;
+            }
+
+            /* 隱藏 Logo 以節省手機空間，或縮小 */
+            .logo {
+                margin-bottom: 15px;
+                font-size: 1.1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -240,6 +288,7 @@
         const wrap = document.getElementById('canvas-wrap');
         scene = new THREE.Scene();
         
+        // 調整相機視野，防止手機端視野過窄
         camera = new THREE.PerspectiveCamera(45, wrap.clientWidth / wrap.clientHeight, 1, 3000);
         camera.position.set(200, 200, 350); 
 
@@ -266,25 +315,19 @@
 
         window.addEventListener('resize', onResize);
         
-        // 初始化時先計算一次體積重
+        // 初始化計算
         calcVolWeight();
         
         animate();
     }
 
-    // 新增：即時計算體積重函數
     function calcVolWeight() {
         const L = parseFloat(document.getElementById('binL').value) || 0;
         const W = parseFloat(document.getElementById('binW').value) || 0;
         const H = parseFloat(document.getElementById('binH').value) || 0;
 
-        // 體積 (cm3)
         const vol = L * W * H;
-
-        // 空運體積重：除以 6000
         const airWeight = vol / 6000;
-        
-        // 海運體積重：除以 1000 (1 CBM = 1000kg)
         const seaWeight = vol / 1000;
 
         document.getElementById('vw-air').innerText = airWeight.toFixed(1) + ' kg';
@@ -293,6 +336,7 @@
 
     function onResize() {
         const wrap = document.getElementById('canvas-wrap');
+        if (!wrap) return;
         camera.aspect = wrap.clientWidth / wrap.clientHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(wrap.clientWidth, wrap.clientHeight);

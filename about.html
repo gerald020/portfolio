@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>About Me - Gerald Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 1. 讓背景透明，才能看到 index.html 的粒子 */
+        body {
+            background: transparent !important;
+            padding: 100px 10% 10px; 
+            color: white;
+            font-family: 'Noto Sans TC', sans-serif;
+            
+            /* 2. 針對手機端：隱藏滾動條但保持滾動功能 (Firefox & IE) */
+            scrollbar-width: none;       /* Firefox */
+            -ms-overflow-style: none;    /* IE and Edge */
+            -webkit-overflow-scrolling: touch; /* 讓手機滑動順暢 */
+        }
+
+        /* 3. 針對手機端：隱藏滾動條 (Chrome, Safari, iOS) */
+        body::-webkit-scrollbar {
+            display: none; /* 隱藏右側滑條 */
+        }
+    </style>
+</head>
+<body class="fade-in">
+  
+
+
+    <div class="subpage-container">
+        <div class="glass-card about-content">
+            <h1 class="section-title"> <span>About me</span></h1>
+            <p>這裡填寫您的個人經歷、教育背景以及對技術與供應鏈的熱情...</p>
+        </div>
+    </div>
+</body>
+</html>

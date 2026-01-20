@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPack Pro | 企業級裝箱模擬</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --brand-primary: #0f172a;
+            --accent-blue: #3b82f6;
+            --bg-canvas: #f1f5f9;
+            --text-light: #94a3b8;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            overflow: hidden;
+        }
+
+        /* 側邊欄設計 */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: var(--brand-primary);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 20px;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.15);
+            z-index: 20;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-dot { width: 10px; height: 10px; background: var(--accent-blue); border-radius: 2px; }
+
+        .control-group {
+            margin-bottom: 24px;
+        }
+
+        .group-header {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            border-left: 3px solid var(--accent-blue);
+            padding-left: 8px;
+        }
+
+        /* 輸入區精確對齊 */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .input-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-item label {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+        }
+
+        input {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 8px;
+            color: white;
+            border-radius: 4px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* 新增：體積重顯示區塊 */
+        .vol-info {
+            margin-top: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 10px;
+            border: 1px solid #334155;
+        }
+
+        .vol-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            color: #94a3b8;
+        }
+
+        .vol-row:last-child { margin-bottom: 0; }
+
+        .vol-val {
+            font-family: 'Roboto Mono', monospace;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        button {
+            background: var(--accent-blue);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: auto;
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        button:hover { background: #2563eb; }
+        button:active { transform: scale(0.98); }
+
+        /* 右側主視圖 */
+        #main-container {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 10px 0 20px -5px rgba(0,0,0,0.05);
+            background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+        }
+
+        /* 數據浮層 */
+        #data-overlay {
+            position: absolute;
+            top: 24px;
+            left: 30px;
+            display: flex;
+            gap: 16px;
+            pointer-events: none;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            min-width: 120px;
+        }
+
+        .metric-label { font-size: 0.7rem; color: #64748b; margin-bottom: 2px; font-weight: 600; text-transform: uppercase; }
+        .metric-value { font-size: 1.4rem; font-weight: 700; color: var(--brand-primary); }
+
+        #canvas-wrap { flex-grow: 1; width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <div class="logo"><div class="logo-dot"></div>SmartPack Pro</div>
+    
+    <div class="control-group">
+        <div class="group-header">大箱容器配置 (CM)</div>
+        <div class="input-grid">
+            <div class="input-item"><label>長 (L)</label><input type="number" id="binL" value="120" oninput="calcVolWeight()"></div>
+            <div class="input-item"><label>寬 (W)</label><input type="number" id="binW" value="100" oninput="calcVolWeight()"></div>
+            <div class="input-item"><label>高 (H)</label><input type="number" id="binH" value="100" oninput="calcVolWeight()"></div>
+        </div>
+
+        <div class="vol-info">
+            <div class="vol-row">
+                <span>✈️ 空運 (1:6000)</span>
+                <span class="vol-val" id="vw-air">200.0 kg</span>
+            </div>
+            <div class="vol-row">
+                <span>🚢 海運 (1:1000)</span>
+                <span class="vol-val" id="vw-sea">1200.0 kg</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <div class="group-header">小箱貨物配置 (CM)</div>
+        <div class="input-grid">
+            <div class="input-item"><label>長 (l)</label><input type="number" id="boxL" value="40"></div>
+            <div class="input-item"><label>寬 (w)</label><input type="number" id="boxW" value="30"></div>
+            <div class="input-item"><label>高 (h)</label><input type="number" id="boxH" value="25"></div>
+        </div>
+    </div>
+
+    <button onclick="runSimulation()">開始模擬裝箱</button>
+</div>
+
+<div id="main-container">
+    <div id="data-overlay">
+        <div class="metric-card">
+            <div class="metric-label">總容納箱數</div>
+            <div id="res-count" class="metric-value">0</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">空間利用率</div>
+            <div id="res-ratio" class="metric-value">0%</div>
+        </div>
+    </div>
+    <div id="canvas-wrap"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+    let scene, camera, renderer, controls, binModel;
+
+    function init() {
+        const wrap = document.getElementById('canvas-wrap');
+        scene = new THREE.Scene();
+        
+        camera = new THREE.PerspectiveCamera(45, wrap.clientWidth / wrap.clientHeight, 1, 3000);
+        camera.position.set(200, 200, 350); 
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        wrap.appendChild(renderer.domElement);
+
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(100, 200, 100);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        const grid = new THREE.GridHelper(1000, 20, 0xcbd5e1, 0xe2e8f0);
+        grid.position.y = -50;
+        scene.add(grid);
+
+        window.addEventListener('resize', onResize);
+        
+        // 初始化時先計算一次體積重
+        calcVolWeight();
+        
+        animate();
+    }
+
+    // 新增：即時計算體積重函數
+    function calcVolWeight() {
+        const L = parseFloat(document.getElementById('binL').value) || 0;
+        const W = parseFloat(document.getElementById('binW').value) || 0;
+        const H = parseFloat(document.getElementById('binH').value) || 0;
+
+        // 體積 (cm3)
+        const vol = L * W * H;
+
+        // 空運體積重：除以 6000
+        const airWeight = vol / 6000;
+        
+        // 海運體積重：除以 1000 (1 CBM = 1000kg)
+        const seaWeight = vol / 1000;
+
+        document.getElementById('vw-air').innerText = airWeight.toFixed(1) + ' kg';
+        document.getElementById('vw-sea').innerText = seaWeight.toFixed(1) + ' kg';
+    }
+
+    function onResize() {
+        const wrap = document.getElementById('canvas-wrap');
+        camera.aspect = wrap.clientWidth / wrap.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+    }
+
+    function runSimulation() {
+        if(binModel) scene.remove(binModel);
+        binModel = new THREE.Group();
+        scene.add(binModel);
+
+        const bin = { l: +document.getElementById('binL').value, w: +document.getElementById('binW').value, h: +document.getElementById('binH').value };
+        const box = { l: +document.getElementById('boxL').value, w: +document.getElementById('boxW').value, h: +document.getElementById('boxH').value };
+
+        const binGeo = new THREE.BoxGeometry(bin.l, bin.h, bin.w);
+        const edges = new THREE.EdgesGeometry(binGeo);
+        const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x1e293b, linewidth: 2 }));
+        binModel.add(line);
+
+        const nx = Math.floor(bin.l / box.l);
+        const ny = Math.floor(bin.h / box.h);
+        const nz = Math.floor(bin.w / box.w);
+        const total = nx * ny * nz;
+
+        document.getElementById('res-count').innerText = total;
+        const ratio = ((box.l * box.w * box.h * total) / (bin.l * bin.w * bin.h) * 100).toFixed(1);
+        document.getElementById('res-ratio').innerText = ratio + '%';
+
+        const boxGeo = new THREE.BoxGeometry(box.l * 0.96, box.h * 0.96, box.w * 0.96);
+        const boxMat = new THREE.MeshPhongMaterial({ color: 0x2563eb, shininess: 50, flatShading: true });
+
+        let count = 0;
+        for (let j = 0; j < ny; j++) {
+            for (let k = 0; k < nz; k++) {
+                for (let i = 0; i < nx; i++) {
+                    const mesh = new THREE.Mesh(boxGeo, boxMat);
+                    mesh.position.set(
+                        -bin.l/2 + box.l/2 + i * box.l,
+                        -bin.h/2 + box.h/2 + j * box.h,
+                        -bin.w/2 + box.w/2 + k * box.w
+                    );
+                    mesh.visible = false;
+                    binModel.add(mesh);
+                    
+                    setTimeout(() => {
+                        mesh.visible = true;
+                    }, count * 15);
+                    count++;
+                }
+            }
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+    }
+
+    init();
+</script>
+</body>
+</html>

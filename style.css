@@ -1,0 +1,519 @@
+/* 模態框背景 */
+.modal {
+    display: none; /* 初始隱藏 */
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(5, 10, 15, 0.95); /* 深色背景 */
+    backdrop-filter: blur(15px);
+}
+
+/* 關閉按鈕 */
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #00d2ff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10000;
+}
+
+/* 內容容器 */
+.modal-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 90%;
+    margin: auto;
+}
+
+/* 放大後的媒體樣式 */
+.modal-content img, .modal-content video {
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+}
+
+.modal-content iframe {
+    width: 100%;
+    height: 85vh;
+    border: none;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.05);
+}
+
+/* 讓卡片看起來可點擊 */
+.glass-card { cursor: pointer; }
+
+/* 基礎設定 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #050a0f; /* 深黑色背景 */
+    color: #ffffff;
+    font-family: 'Noto Sans TC', sans-serif;
+    overflow-x: hidden;
+}
+
+/* 粒子背景層 */
+#particles-js {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: radial-gradient(circle at center, #0a192f 0%, #050a0f 100%);
+}
+
+/* 導航列 */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 10%;
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+}
+
+.logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.logo span {
+    color: #00d2ff;
+}
+
+.nav-links {
+    list-style: none;
+    display: none;    /* 隱藏右上方選單 */
+}
+
+.nav-links li {
+    margin-left: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #ccc;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #00d2ff;
+}
+
+/* Hero 區塊 */
+.hero {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-content {
+    z-index: 1;
+    
+}
+
+/* 頭像外框動畫 */
+.profile-frame {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    padding: 5px;
+    position: relative;
+    background: linear-gradient(45deg, #00d2ff, #9d50bb);
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    background-image: url("images/myphoto.jpg"); 
+    background-size: cover; 
+    background-position: center 15%;
+    border-radius: 50%;
+    border: 2px solid #050a0f;
+}
+
+/* 名字保持原本淡入浮動效果 */
+.hero-content h1 {
+	 font-family: 'Roboto', 'Arial', sans-serif;
+	 font-size: 30px;   /* 這裡改字體大小 */
+	 font-weight: 700; 
+	 margin: 16px 0;
+    opacity: 0;
+    animation: floatUp 1.5s ease forwards;
+}
+
+/* 打字機效果：副標題 */
+.hero-content .subtitle {
+    overflow: hidden;              /* 隱藏超出文字 */
+    white-space: nowrap;           /* 不換行 */
+    border-right: 2px solid #00d2ff; /* 游標效果 */
+    width: 0;                      /* 初始寬度 */
+    animation: typing 3s steps(15) forwards, blink 0.7s infinite;
+    animation-delay: 0.5s;         /* 延遲出現 */
+}
+
+/* 打字機效果：描述文字 */
+.hero-content .description {
+    display: inline-block; /* 讓寬度隨內容變化 */
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;              /* 初始寬度為 0 */
+    visibility: hidden;    /* 初始隱藏 */
+    animation: typing 4s steps(30) forwards, blink 0.8s step-end infinite;
+    animation-delay: 3.5s;
+}
+
+
+/* 打字機動畫 */
+@keyframes typing {
+    from { width: 0; visibility: visible; } /* 動畫開始才顯示 */
+    to   { width: 100%; visibility: visible; }
+}
+
+
+/* 游標閃爍 */
+@keyframes blink {
+    50% { border-color: transparent; }
+}
+
+/* 浮動效果動畫（名字用） */
+@keyframes floatUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    50% { opacity: 1; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+
+
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #00d2ff;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.description {
+    color: #888;
+    max-width: 500px;
+    margin: 0 auto 30px;
+    line-height: 1.6;
+}
+
+/* 按鈕樣式 */
+.cta-buttons .btn {
+    text-decoration: none;
+    padding: 12px 30px;
+    border-radius: 5px;
+    margin: 0 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: 0.4s;
+    display: inline-block;
+}
+
+.btn.primary {
+    background: #00d2ff;
+    color: #050a0f;
+    border: 1px solid #00d2ff;
+}
+
+.btn.primary:hover {
+    background: transparent;
+    color: #00d2ff;
+    box-shadow: 0 0 15px #00d2ff;
+}
+
+.btn.secondary {
+    border: 1px solid #444;
+    color: #fff;
+}
+
+.btn.secondary:hover {
+    border-color: #00d2ff;
+    color: #00d2ff;
+}
+
+/* --- 移動端響應式優化 --- */
+
+@media (max-width: 768px) {
+    /* 導航欄調整 */
+    nav {
+        padding: 20px 5%;
+        flex-direction: column; /* 標誌與選單上下排列 */
+        gap: 15px;
+    }
+
+    .nav-links li {
+        margin: 0 10px;
+    }
+
+    /* 文字大小優化 */
+    h1 {
+        font-size: 2.2rem; /* 縮小標題防止換行破碎 */
+        letter-spacing: 2px;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .description {
+        font-size: 0.9rem;
+        padding: 0 20px;
+        margin-bottom: 25px;
+    }
+
+    /* 頭像縮小 */
+    .profile-frame {
+        width: 120px;
+        height: 120px;
+    }
+
+    /* 按鈕改為垂直排列或並排調整 */
+    .cta-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .cta-buttons .btn {
+        width: 80%; /* 按鈕在手機上更寬，方便點擊 */
+        margin: 0;
+        text-align: center;
+    }
+}
+
+/* 針對極小螢幕（如 iPhone SE） */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .nav-links {
+	display: none;
+        font-size: 0.8rem;
+    }
+}
+
+/* 覆蓋層容器：實現從中心圓形擴散 */
+.page-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 10, 15, 0.5); /* 深色透明背景 */
+    backdrop-filter: blur(5px);      /* 玻璃模糊效果 */
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 2000;
+    visibility: hidden;
+    opacity: 0;
+    clip-path: circle(0% at 50% 50%); /* 初始圓形大小為 0 */
+    transition: all 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* 當激活時圓形擴散至全屏 */
+.page-overlay.active {
+    visibility: visible;
+    opacity: 1;
+    clip-path: circle(150% at 50% 50%);
+}
+
+.overlay-wrapper {
+    overflow: hidden
+
+}
+
+/* 玻璃擬態卡片樣式 */
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 30px;
+    transition: 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #00d2ff;
+    box-shadow: 0 0 25px rgba(0, 210, 255, 0.2);
+}
+
+/* 請在 projects.html 的 <style> 或 style.css 中確認 */
+.close-modal {
+    position: fixed; /* 改為 fixed 確保捲動時位置固定 */
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #00d2ff;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 10001;
+    transition: 0.3s;
+}
+
+.project-info {
+  padding: 24px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+  background: rgba(5, 10, 15, 0.7); /* 深色半透明背景 */
+}
+
+
+.close-modal:hover {
+    background: #00d2ff;
+    color: #050a0f;
+}
+
+/* 項目排版樣式 */
+.subpage-container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-title span {
+    color: #00d2ff;
+}
+
+.project-showcase {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.media-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.media-container video, 
+.media-container img, 
+.media-container iframe {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+}
+
+/* 覆蓋層容器：實現從中心圓形擴散 */
+.page-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 10, 15, 0.3); /* 調整透明度測試效果 */
+    backdrop-filter: blur(5px);      /* 磨砂玻璃模糊 */
+    -webkit-backdrop-filter: blur(25px);
+    z-index: 2000;
+    visibility: hidden;
+    opacity: 0;
+    clip-path: circle(0% at 50% 50%); /* 動畫起點：中心的一個點 */
+    transition: all 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* 激活狀態：圓形擴大至 150% 覆蓋全螢幕 */
+.page-overlay.active {
+    visibility: visible;
+    opacity: 1;
+    clip-path: circle(150% at 50% 50%);
+}
+
+.overlay-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 關閉按鈕樣式 */
+.close-btn {
+    position: absolute;
+    top: 8px;
+    left: 5%;
+    background: transparent;
+    border: 1px solid #00d2ff;
+    color: #00d2ff;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    z-index: 2100;
+    transition: 0.3s;
+    border-radius: 5px;
+}
+
+.close-btn:hover {
+    background: #00d2ff;
+    color: #050a0f;
+}
+
+/* 強制隱藏所有覆蓋層內的滑條 */
+#subpage-frame::-webkit-scrollbar,
+.overlay-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+#subpage-frame,
+.overlay-wrapper {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+
+
+
+
+

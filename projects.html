@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Gerald Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 頁面專屬樣式設定 --- */
+
+        body {
+            background: transparent !important;
+            padding: 1px 5% 50px; 
+            color: white;
+            font-family: 'Noto Sans TC', sans-serif;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+        }
+        body::-webkit-scrollbar { display: none; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        /* 3. 專案卡片樣式 */
+        .project-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 16px;
+            overflow: hidden; /* 確保圖片放大時不超出圓角 */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #00f2ff;
+            box-shadow: 0 15px 40px rgba(0, 210, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* --- 圖片縮圖區域優化 --- */
+        .project-thumb {
+            height: 160px;
+            background-color: #0f172a; /* 預設背景色，防止圖片載入失敗時太突兀 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 3.5rem;
+            
+            /* 背景圖片通用設定 */
+            background-size: cover;
+            background-position: center;
+            transition: all 0.6s ease; /* 圖片動畫時間 */
+        }
+
+        /* 針對有設定背景圖片的卡片進行濾鏡處理 */
+        .project-thumb[style*="background-image"] {
+            /* 預設狀態：稍微調暗、增加對比，讓文字更突出 */
+            filter: brightness(0.8) contrast(1.1) saturate(1.2);
+        }
+
+        /* 滑鼠懸停特效：圖片變亮、飽和度提高、微放大 */
+        .project-card:hover .project-thumb[style*="background-image"] {
+            filter: brightness(1.1) contrast(1) saturate(1.5);
+            transform: scale(1.05); /* 微放大圖片 */
+        }
+
+        .project-info {
+            padding: 24px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            z-index: 1; /* 確保文字在圖片上方 (若有重疊) */
+        }
+
+        .project-info h3 {
+            margin-bottom: 8px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .project-info p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            flex-grow: 1;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tags span {
+            background: rgba(0, 210, 255, 0.1);
+            color: #00d2ff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+        }
+
+        .view-btn {
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 0.8;
+            transition: 0.3s;
+            margin-top: auto;
+        }
+        
+        .project-card:hover .view-btn {
+            color: #00d2ff;
+            opacity: 1;
+            gap: 10px;
+        }
+
+        /* --- Modal 與 導航列 --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #050a0f;
+            animation: fadeIn 0.3s ease-out;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal-header {
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn {
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 210, 255, 0.15);
+            border-color: #00d2ff;
+            color: #00d2ff;
+            transform: translateX(-5px);
+        }
+
+        .modal-content {
+            flex-grow: 1;
+            width: 100%;
+            height: calc(100% - 60px);
+            border: none;
+            animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body class="fade-in">
+
+    <div class="subpage-container">
+        <h1 class="section-title" style="margin-top: 40px; text-align: left; border-left: 50px solid #00d2ff; padding-left: 20px;">
+            Selected <span style="color: #00d2ff;">Projects</span>
+        </h1>
+
+        <div class="grid-container">
+            
+            <div class="project-card" onclick="openProject('WMS_Dashboard.html')">
+                <div class="project-thumb" style="background-image: url('images/wms_bg.jpg');">
+                    </div>
+                <div class="project-info">
+                    <h3>Ensuring Operational Certainty with WMS</h3>
+                    <p>互動式簡報分析。探索 DHL、DSV 等物流巨頭的 WMS 佈局與數位化戰略。</p>
+                    <div class="tags">
+                        <span>Dashboard</span>
+                        <span>Data Search</span>
+                        <span>Marketing</span>
+                    </div>
+                    <span class="view-btn">See Showcase →</span>
+                </div>
+            </div>
+
+            <div class="project-card" onclick="openProject('airport_analysis.html')">
+                <div class="project-thumb" style="background-image: url('images/HKIA Analysis.jpg');
+                          background-position: center;">
+ 			</div>
+                <div class="project-info">
+                    <h3>HKIA K-Shaped Recovery</h3>
+                    <p>解析 HKIA 2016-2025 年數據，探討為何客運斷崖下跌的同時，貨運卻能逆勢突圍，形成獨特的「剪刀差」現象</p>
+                    <div class="tags">
+                        <span>Data Viz</span>
+                        <span>Data Analysis</span>
+                        <span>Reveal.js</span>
+                    </div>
+                    <span class="view-btn">See Showcase →</span>
+                </div>
+            </div>
+
+            <div class="project-card" onclick="openProject('SmartPack Pro.html')">
+                <div class="project-thumb" style="background-image: url('images/SmartPack Pro.jpg');
+                          background-position: center;">
+ 			</div>
+                <div class="project-info">
+                    <h3>SmartPack AI 3D</h3>
+                    <p>極速計算空間利用率，動態視覺化 3D 裝箱模擬演示</p>
+                    <div class="tags">
+                        <span>3D</span>
+                        <span>Packing</span>
+                        <span>Space Utilization</span>
+                    </div>
+                    <span class="view-btn">See Showcase →</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="project-modal" class="modal">
+        <div class="modal-header">
+            <div class="back-btn" onclick="closeProject()">
+                <span>←</span> Back to Projects
+            </div>
+        </div>
+        
+        <div id="modal-body" class="modal-content"></div>
+    </div>
+
+<script>
+        function openProject(src) {
+            const modal = document.getElementById('project-modal');
+            const modalBody = document.getElementById('modal-body');
+            
+            // 【修正重點】：指定 ID 選擇器 #content-overlay .close-btn
+            // 這樣才能準確抓到當前顯示的那個關閉按鈕，而不是抓到其他隱藏頁面的按鈕
+            if (window.parent && window.parent.document.querySelector('#content-overlay .close-btn')) {
+                window.parent.document.querySelector('#content-overlay .close-btn').style.display = 'none';
+            }
+
+            // 注入 iframe
+            modalBody.innerHTML = `<iframe src="${src}" style="width:100%; height:100%; border:none; background:#000;" allowfullscreen></iframe>`;
+
+            // 顯示模態框
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeProject() {
+            const modal = document.getElementById('project-modal');
+            const modalBody = document.getElementById('modal-body');
+            
+            // 隱藏模態框
+            modal.style.display = 'none';
+            modalBody.innerHTML = ''; 
+            document.body.style.overflow = 'auto';
+
+            // 【修正重點】：同樣使用精確的選擇器來恢復按鈕顯示
+            if (window.parent && window.parent.document.querySelector('#content-overlay .close-btn')) {
+                window.parent.document.querySelector('#content-overlay .close-btn').style.display = 'block';
+            }
+        }
+    </script></body>
+</html>

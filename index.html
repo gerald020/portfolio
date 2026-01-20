@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerald Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <nav>
+        <div class="logo">Gerald <span>Studio</span></div>
+   <ul class="nav-links">
+   	 <li><a href="javascript:void(0)" onclick="openOverlay('about-overlay')">關於</a></li>
+    
+   	 <li><a href="javascript:void(0)" onclick="openDynamicPage('projects.html')">項目</a></li>
+   </ul>
+    </nav>
+
+    <main class="hero">
+        <div class="hero-content">
+            <div class="profile-frame">
+                <div class="avatar"></div>
+            </div>
+            <h1>ZHANG Guoyong</h1>
+            <p class="subtitle">Bridging Logistics & Digital Innovation</p>
+            <p class="description">Optimizing Supply Chains with IT & Security Solutions</p>
+	    <div class="cta-buttons">
+  			  <a href="javascript:void(0)" class="btn primary" onclick="openDynamicPage('projects.html')">View Projects</a>
+          </div>
+        </div>
+    </main>
+
+                      
+
+    
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // 粒子背景初始化
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#00d2ff" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5 },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#00d2ff", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 2 }
+            },
+            "interactivity": {
+                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" } }
+            },
+            "retina_detect": true
+        });
+
+        // 轉場動畫邏輯
+        function openOverlay(id) {
+            const el = document.getElementById(id);
+            el.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeOverlay(id) {
+            const el = document.getElementById(id);
+            el.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+<div id="content-overlay" class="page-overlay">
+    <button class="close-btn" onclick="closeDynamicOverlay()">CLOSE ×</button>
+    <div class="overlay-wrapper">
+        <iframe id="subpage-frame" src="" frameborder="0" style="width:100%; height:100%;"></iframe>
+    </div>
+</div>
+<script>
+    function openDynamicPage(url) {
+        const overlay = document.getElementById('content-overlay');
+        const iframe = document.getElementById('subpage-frame');
+        
+        // 設定要加載的頁面
+        iframe.src = url;
+        
+        // 加入 active 類名觸發圓形擴散動畫
+        overlay.classList.add('active');
+        
+        // 防止底層網頁捲動
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDynamicOverlay() {
+        const overlay = document.getElementById('content-overlay');
+        const iframe = document.getElementById('subpage-frame');
+        
+        // 移除 active 類名關閉動畫
+        overlay.classList.remove('active');
+        
+        // 恢復捲動
+        document.body.style.overflow = 'auto';
+        
+        // 延遲清空 iframe 路徑，避免下次打開時閃爍舊內容
+        setTimeout(() => { iframe.src = ""; }, 800);
+    }
+</script>
+</body>
+</html>

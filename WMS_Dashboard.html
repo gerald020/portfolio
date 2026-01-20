@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS Operational Excellence | Blue Yonder Advantage</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: "Operational Clarity" -->
+    <!-- Palette Logic:
+         - Background: #F8FAFC (Slate 50) - Clean, professional interface.
+         - Primary: #1E3A8A (Blue 900) - Stability, Trust, Corporate Standard.
+         - Action: #2563EB (Blue 600) - Blue Yonder Brand alignment.
+         - Highlights: #059669 (Emerald 600) - Positive metrics, ROI.
+    -->
+
+    <!-- Application Structure Plan:
+         1. Executive Briefing: Focus on "Operational Certainty" - The WMS as the engine of trust.
+         2. Global 3PL Benchmarking: Analysis of Top 3PLs (DHL, DSV, K+N). 
+            *MODIFICATION*: Focus on their need for consistency and standardized service levels, removing the "build vs buy" cost debate.
+         3. Technical Deep Dive (Interactive):
+            - Waveless Picking (Speed).
+            - Task Interleaving (Efficiency).
+            - Dynamic Slotting (Space).
+         4. Capability Matrix: Radar chart comparing Tier 1 vs Legacy on execution capabilities.
+         5. ROI Simulator: Interactive calculator for labor and error reduction.
+    -->
+
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+        }
+        @media (min-width: 1024px) {
+            .chart-container { height: 400px; }
+        }
+        
+        .tab-active {
+            border-bottom: 2px solid #2563EB;
+            color: #1E3A8A;
+            background-color: #EFF6FF;
+        }
+        
+        .feature-card { transition: all 0.3s ease; }
+        .feature-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-2">🏭</span>
+                    <span class="font-bold text-xl text-slate-900">Supply Chain  Analysis</span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <button onclick="scrollToId('hero')" class="text-sm font-medium text-slate-500 hover:text-blue-600">Overview</button>
+                    <button onclick="scrollToId('benchmarking')" class="text-sm font-medium text-slate-500 hover:text-blue-600">Industry Standard</button>
+                    <button onclick="scrollToId('deep-dive')" class="text-sm font-medium text-slate-500 hover:text-blue-600">Operational Edge</button>
+                    <button onclick="scrollToId('simulator')" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition">Value Simulator</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- 1. Executive Summary -->
+        <section id="hero" class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold mb-4">EXECUTIVE INSIGHT</div>
+                <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+                    Why the WMS is Your <br><span class="text-blue-600">Competitive Advantage</span>
+                </h1>
+                <p class="text-lg text-slate-600 mb-6 leading-relaxed">
+                    In modern logistics, clients don't just buy storage space; they buy <strong>speed, accuracy, and visibility</strong>. 
+                    <br><br>
+                    As an operational partner, we utilize <strong>Blue Yonder</strong>—the same engine used by the world's top 3PLs—to guarantee that your supply chain runs with military precision. It allows us to handle complex requirements that basic systems simply cannot support.
+                </p>
+                <div class="flex space-x-6">
+                    <div class="border-l-4 border-blue-600 pl-4">
+                        <p class="text-2xl font-bold text-slate-900">99.9%</p>
+                        <p class="text-sm text-slate-500">Inventory Accuracy Target</p>
+                    </div>
+                    <div class="border-l-4 border-emerald-500 pl-4">
+                        <p class="text-2xl font-bold text-slate-900">Real-Time</p>
+                        <p class="text-sm text-slate-500">Data Visibility</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-100">
+                <h3 class="text-sm font-bold text-slate-500 uppercase mb-4">System Reliability Under Peak Load</h3>
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="reliabilityChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-slate-400 mt-2">Blue Yonder maintains performance even during Black Friday peaks.</p>
+            </div>
+        </section>
+
+        <!-- 2. Global 3PL Benchmarking -->
+        <section id="benchmarking" class="space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <h2 class="text-2xl font-bold text-slate-900">The Industry Standard</h2>
+                <p class="mt-2 text-slate-600 max-w-4xl">
+                    Leading global 3PLs (DHL, Kuehne+Nagel, DSV) rely on Tier 1 systems like Blue Yonder to ensure they can deliver consistent results across every facility, regardless of complexity.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Market Share -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-1">
+                    <h3 class="font-semibold text-slate-700 mb-4 text-center">System Adoption in Top 10 3PLs</h3>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="marketChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Strategic Rationale List -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2">
+                    <h3 class="font-semibold text-slate-700 mb-6">Operational Benefits for Our Clients</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-xl">🛡️</div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-slate-900">Risk Mitigation</h4>
+                                <p class="text-sm text-slate-600 mt-1">
+                                    Using a Tier 1 system eliminates the risk of "system failure" during critical periods. It provides a robust, tested foundation that ensures your orders keep moving, no matter the volume.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-10 w-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-xl">🧩</div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-slate-900">Handling Complexity</h4>
+                                <p class="text-sm text-slate-600 mt-1">
+                                    Whether you need batch tracking, serial number capture, or specific expiration date logic, Blue Yonder handles these complex rules natively without requiring unstable custom code.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-10 w-10 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-xl">⚡</div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-slate-900">Speed to Market</h4>
+                                <p class="text-sm text-slate-600 mt-1">
+                                    Advanced integration capabilities mean we can connect to your ERP or E-commerce platform (Shopify, SAP, Magento) faster, getting your products live and shipping sooner.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-10 w-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-xl">📊</div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-slate-900">Data Visibility</h4>
+                                <p class="text-sm text-slate-600 mt-1">
+                                    You get real-time transparency. No more waiting for end-of-day reports. You see what we see, allowing for better supply chain planning on your end.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Technical Deep Dive (Operational Superiority) -->
+        <section id="deep-dive" class="bg-slate-900 rounded-2xl p-8 text-white shadow-2xl">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-white">How We Optimize Your Operations</h2>
+                <p class="text-slate-400 mt-2">Comparison: Standard WMS vs. Blue Yonder Advanced Logic</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Navigation Tabs -->
+                <div class="w-full lg:w-1/4 flex flex-col space-y-2">
+                    <button onclick="showTechDetail('interleaving')" id="tab-interleaving" class="tech-tab p-4 rounded-lg text-left bg-blue-600 text-white font-semibold transition">
+                        Task Interleaving
+                    </button>
+                    <button onclick="showTechDetail('waveless')" id="tab-waveless" class="tech-tab p-4 rounded-lg text-left bg-slate-800 text-slate-400 hover:bg-slate-700 transition">
+                        Order Streaming
+                    </button>
+                    <button onclick="showTechDetail('slotting')" id="tab-slotting" class="tech-tab p-4 rounded-lg text-left bg-slate-800 text-slate-400 hover:bg-slate-700 transition">
+                        Dynamic Slotting
+                    </button>
+                </div>
+
+                <!-- Content Area -->
+                <div class="w-full lg:w-3/4 bg-slate-800 rounded-xl p-8 border border-slate-700 relative min-h-[300px]">
+                    <div id="tech-content">
+                        <!-- Content injected via JS -->
+                    </div>
+                    
+                    <!-- Visualization of the concept -->
+                    <div class="mt-6 pt-6 border-t border-slate-700">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs uppercase tracking-widest text-slate-500 font-bold">Efficiency Impact</span>
+                        </div>
+                        <div class="relative w-full h-4 bg-slate-700 rounded-full overflow-hidden">
+                            <div id="impact-bar" class="absolute top-0 left-0 h-full bg-emerald-500 transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>Basic System</span>
+                            <span id="impact-text" class="text-emerald-400 font-bold">Blue Yonder: +25% Efficiency</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Advanced ROI Simulator -->
+        <section id="simulator" class="space-y-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-slate-900">Your Potential Savings</h2>
+                <p class="text-slate-600 mt-2 max-w-2xl mx-auto">
+                    Efficient operations translate directly to cost savings. Use this tool to estimate the value of moving your volume to a Blue Yonder-managed facility.
+                    <br>
+                    <span class="text-sm italic text-slate-500">Based on typical operational improvements.</span>
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3">
+                    
+                    <!-- Controls -->
+                    <div class="col-span-1 bg-slate-50 p-8 border-r border-slate-200 space-y-6">
+                        <h3 class="font-bold text-slate-700 uppercase text-sm tracking-wide mb-4">Your Volume & Metrics</h3>
+                        
+                        <!-- Input 1 -->
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <label class="text-sm font-medium text-slate-700">Monthly Orders</label>
+                                <span id="lbl-lines" class="text-sm font-bold text-blue-600">50,000</span>
+                            </div>
+                            <input type="range" min="10000" max="200000" step="5000" value="50000" id="inp-lines" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+
+                        <!-- Input 2 -->
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <label class="text-sm font-medium text-slate-700">Current Picking Accuracy</label>
+                                <span id="lbl-acc" class="text-sm font-bold text-rose-500">98.0%</span>
+                            </div>
+                            <input type="range" min="95.0" max="99.5" step="0.1" value="98.0" id="inp-acc" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-500">
+                            <p class="text-xs text-slate-400 mt-1">Goal: 99.9% accuracy.</p>
+                        </div>
+
+                        <!-- Input 3 -->
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <label class="text-sm font-medium text-slate-700">Est. Cost Per Error ($)</label>
+                                <span id="lbl-cost" class="text-sm font-bold text-slate-600">$25</span>
+                            </div>
+                            <input type="range" min="10" max="50" step="5" value="25" id="inp-cost" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-500">
+                            <p class="text-xs text-slate-400 mt-1">Cost of reshipping, CS time, claims.</p>
+                        </div>
+                    </div>
+
+                    <!-- Visual Results -->
+                    <div class="col-span-2 p-8 flex flex-col justify-center">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <!-- Saving Bucket 1 -->
+                            <div class="bg-emerald-50 rounded-xl p-6 border border-emerald-100">
+                                <div class="text-emerald-600 text-sm font-bold uppercase mb-1">Errors Prevented (Annual)</div>
+                                <div class="text-3xl font-extrabold text-emerald-900" id="res-errors">0</div>
+                                <p class="text-xs text-emerald-500 mt-2">Orders shipped correctly the first time.</p>
+                            </div>
+                            
+                            <!-- Saving Bucket 2 -->
+                            <div class="bg-blue-50 rounded-xl p-6 border border-blue-100">
+                                <div class="text-blue-600 text-sm font-bold uppercase mb-1">Cost Avoidance (Annual)</div>
+                                <div class="text-3xl font-extrabold text-blue-900" id="res-savings">$0</div>
+                                <p class="text-xs text-blue-500 mt-2">Direct savings on error rectification.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900 rounded-xl p-6 text-white relative overflow-hidden">
+                            <div class="relative z-10">
+                                <h4 class="text-slate-400 text-sm uppercase font-semibold">Total Operational Value</h4>
+                                <div class="mt-2">
+                                    <p class="text-lg">By switching to our Blue Yonder facility, you ensure:</p>
+                                    <ul class="list-disc pl-5 mt-2 space-y-1 text-slate-300 text-sm">
+                                        <li>Higher Customer Satisfaction (NPS)</li>
+                                        <li>Faster Inventory Turnover</li>
+                                        <li>Scalability for your peak seasons</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- Background Decoration -->
+                            <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-4 translate-y-4">
+                                <span class="text-9xl">📈</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 py-10">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="mb-2 font-semibold text-slate-200">Supply Chain Analysis</p>
+            
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- 1. Utilities ---
+        const formatCurrency = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+
+        // --- 2. Chart Configurations ---
+        
+        // Chart 1: Reliability (Line Chart)
+        const ctxReliability = document.getElementById('reliabilityChart').getContext('2d');
+        new Chart(ctxReliability, {
+            type: 'line',
+            data: {
+                labels: ['Normal Day', 'Promo Start', 'Peak Season', 'Flash Sale'],
+                datasets: [{
+                    label: 'Blue Yonder Performance',
+                    data: [100, 100, 99.9, 99.8], // Stable
+                    borderColor: '#2563EB',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.1,
+                    fill: true
+                }, {
+                    label: 'Basic WMS Performance',
+                    data: [98, 92, 85, 70], // Drops under load
+                    borderColor: '#94A3B8',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    tension: 0.3,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: false, 
+                        min: 60,
+                        max: 105,
+                        title: { display: true, text: 'Order Processing Speed (%)' }
+                    }
+                }
+            }
+        });
+
+        // Chart 2: Market Share (Doughnut)
+        const ctxMarket = document.getElementById('marketChart').getContext('2d');
+        new Chart(ctxMarket, {
+            type: 'doughnut',
+            data: {
+                labels: ['Blue Yonder', 'Manhattan', 'SAP EWM', 'Legacy/Others'],
+                datasets: [{
+                    data: [35, 25, 20, 20],
+                    backgroundColor: ['#1E40AF', '#3B82F6', '#60A5FA', '#CBD5E1'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } }
+                },
+                cutout: '70%'
+            }
+        });
+
+        // --- 3. Interaction Logic: Technical Deep Dive ---
+        
+        const techData = {
+            'interleaving': {
+                title: 'Task Interleaving',
+                content: `
+                    <p class="mb-4"><strong>Concept:</strong> "Deadheading" (driving empty) is waste. Blue Yonder combines tasks intelligently.</p>
+                    <p class="mb-4"><strong>Operational Benefit:</strong> When an operator puts away a pallet, the system immediately directs them to a nearby pick. This creates a continuous flow of productivity.</p>
+                    <ul class="list-disc pl-5 text-slate-300 space-y-2">
+                        <li>Reduces travel time by <strong>30%</strong>.</li>
+                        <li>Ensures your orders are picked faster.</li>
+                    </ul>
+                `,
+                impact: '30%'
+            },
+            'waveless': {
+                title: 'Order Streaming (Waveless)',
+                content: `
+                    <p class="mb-4"><strong>Concept:</strong> Instead of waiting for a "batch" of orders to be released every few hours, orders are released to the floor immediately based on priority.</p>
+                    <p class="mb-4"><strong>Operational Benefit:</strong> High-priority or Express orders are processed instantly without disrupting the general workflow.</p>
+                    <ul class="list-disc pl-5 text-slate-300 space-y-2">
+                        <li>Enables <strong>Same-Day Shipping</strong>.</li>
+                        <li>Smoothens workload, preventing bottlenecks.</li>
+                    </ul>
+                `,
+                impact: '45%'
+            },
+            'slotting': {
+                title: 'Dynamic Slotting',
+                content: `
+                    <p class="mb-4"><strong>Concept:</strong> The system analyzes item velocity (how fast it sells) and suggests moving items to better locations.</p>
+                    <p class="mb-4"><strong>Operational Benefit:</strong> Fast movers are kept near the shipping dock at waist height. Slow movers are stored higher up or further back.</p>
+                    <ul class="list-disc pl-5 text-slate-300 space-y-2">
+                        <li>Reduces picker fatigue.</li>
+                        <li>Increases pick speed by up to <strong>15%</strong>.</li>
+                    </ul>
+                `,
+                impact: '15%'
+            }
+        };
+
+        function showTechDetail(key) {
+            // Update UI State
+            document.querySelectorAll('.tech-tab').forEach(el => {
+                el.classList.remove('bg-blue-600', 'text-white');
+                el.classList.add('bg-slate-800', 'text-slate-400');
+            });
+            const activeTab = document.getElementById(`tab-${key}`);
+            activeTab.classList.remove('bg-slate-800', 'text-slate-400');
+            activeTab.classList.add('bg-blue-600', 'text-white');
+
+            // Inject Content
+            const data = techData[key];
+            const contentContainer = document.getElementById('tech-content');
+            
+            contentContainer.innerHTML = `
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-slate-600 pb-2">${data.title}</h3>
+                <div class="text-slate-300 leading-relaxed text-sm md:text-base">
+                    ${data.content}
+                </div>
+            `;
+            
+            // Animate Impact Bar
+            const bar = document.getElementById('impact-bar');
+            const text = document.getElementById('impact-text');
+            // Reset to animate
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = data.impact;
+                text.innerText = `Efficiency Gain: +${data.impact}`;
+            }, 100);
+        }
+
+        // Initialize First Tab
+        showTechDetail('interleaving');
+
+
+        // --- 4. Logic: ROI Simulator ---
+
+        const inputs = {
+            lines: document.getElementById('inp-lines'),
+            acc: document.getElementById('inp-acc'),
+            cost: document.getElementById('inp-cost')
+        };
+        const labels = {
+            lines: document.getElementById('lbl-lines'),
+            acc: document.getElementById('lbl-acc'),
+            cost: document.getElementById('lbl-cost')
+        };
+        const results = {
+            errors: document.getElementById('res-errors'),
+            savings: document.getElementById('res-savings')
+        };
+
+        function calculateSimpleROI() {
+            // Get Values
+            const monthlyLines = parseInt(inputs.lines.value);
+            const currentAcc = parseFloat(inputs.acc.value) / 100;
+            const errorCost = parseInt(inputs.cost.value);
+
+            // Constants
+            const TARGET_ACCURACY = 0.999;
+            const ANNUAL_MONTHS = 12;
+
+            // Update Labels
+            labels.lines.innerText = monthlyLines.toLocaleString();
+            labels.acc.innerText = (currentAcc * 100).toFixed(1) + '%';
+            labels.cost.innerText = '$' + errorCost;
+
+            // Calculation
+            // 1. Current Errors per year
+            const currentErrorsAnnual = monthlyLines * (1 - currentAcc) * ANNUAL_MONTHS;
+            
+            // 2. Target Errors per year (with Blue Yonder)
+            const targetErrorsAnnual = monthlyLines * (1 - TARGET_ACCURACY) * ANNUAL_MONTHS;
+
+            // 3. Errors Prevented
+            const errorsPrevented = currentErrorsAnnual - targetErrorsAnnual;
+
+            // 4. Savings
+            const savings = errorsPrevented * errorCost;
+
+            // Render (ensure no negative numbers if input accuracy > target, though rare)
+            const finalErrors = Math.max(0, Math.floor(errorsPrevented));
+            const finalSavings = Math.max(0, savings);
+
+            results.errors.innerText = finalErrors.toLocaleString();
+            results.savings.innerText = formatCurrency(finalSavings);
+        }
+
+        // Listeners
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', calculateSimpleROI);
+        });
+
+        // Initialize
+        calculateSimpleROI();
+
+        // Scroll
+        function scrollToId(id) {
+            const el = document.getElementById(id);
+            const offset = 80;
+            const bodyRect = document.body.getBoundingClientRect().top;
+            const elementRect = el.getBoundingClientRect().top;
+            const elementPosition = elementRect - bodyRect;
+            const offsetPosition = elementPosition - offset;
+            window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M/M/1 T2 Operations Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f0f2f5; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
+        }
+        .dashboard-container { 
+            background: white; padding: 30px; border-radius: 12px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1); width: 100%; max-width: 800px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 30px;
+        }
+        @media (max-width: 768px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+        }
+        h2 { text-align: center; color: #1a73e8; margin-top: 0; grid-column: 1 / -1; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #444; font-weight: 600; font-size: 14px; }
+        input[type="number"] { 
+            width: 100%; padding: 12px; border: 2px solid #e0e0e0; 
+            border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: 0.3s;
+        }
+        input[type="number"]:focus { border-color: #1a73e8; outline: none; }
+        .result-group { 
+            background: #f8f9fa; padding: 20px; border-radius: 8px; 
+            border-left: 6px solid #1a73e8; height: fit-content;
+        }
+        .result-item { 
+            display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #333; 
+        }
+        .result-value { font-weight: bold; color: #1a73e8; }
+        #rho-result { font-size: 22px; }
+        .status-banner { 
+            text-align: center; padding: 12px; border-radius: 8px; 
+            font-weight: bold; margin-top: 20px; color: white; display: none; font-size: 16px;
+        }
+        .status-safe { background-color: #34a853; display: block; }
+        .status-warning { background-color: #fbbc04; color: #333; display: block; }
+        .status-danger { background-color: #ea4335; display: block; }
+        .chart-container {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <h2>✈️T2 Single-Gate Capacity & Queue Prediction Dashboard</h2>
+
+        <div class="control-panel">
+            <div class="input-group">
+                <label>⏱️ Observation Time (Minutes)</label>
+                <input type="number" id="obsTime" value="60" min="1" oninput="calculate()">
+            </div>
+            <div class="input-group">
+                <label>🚗 Total Cars Arrived</label>
+                <input type="number" id="totalCars" value="270" min="0" oninput="calculate()">
+            </div>
+            <div class="input-group">
+                <label>⚙️ Avg Service Time per Car (Seconds)</label>
+                <input type="number" id="avgService" value="12" step="0.1" min="0.1" oninput="calculate()">
+            </div>
+        </div>
+
+        <div class="result-panel">
+            <div class="result-group">
+                <div class="result-item">
+                    <span>Arrival Rate (λ):</span>
+                    <span class="result-value"><span id="lambda-res">4.50</span> cars/min</span>
+                </div>
+                <div class="result-item">
+                    <span>Service Rate (μ):</span>
+                    <span class="result-value"><span id="mu-res">5.00</span> cars/min</span>
+                </div>
+                <div class="result-item" style="border-top: 1px solid #dee2e6; padding-top: 12px; margin-top: 8px;">
+                    <span>System Utilization (ρ):</span>
+                    <span class="result-value" id="rho-result">90.0%</span>
+                </div>
+                <div class="result-item">
+                    <span>Estimated Wait Time:</span>
+                    <span class="result-value" style="color:#ea4335"><span id="wait-res">9.0</span> mins</span>
+                </div>
+            </div>
+            <div id="status-banner" class="status-banner status-warning">
+                ⚠️ HIGH RISK: Expect Long Queues
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="hockeyStickChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let myChart = null; // Store chart instance
+
+        function calculate() {
+            // 1. Get input values
+            const obsTime = parseFloat(document.getElementById('obsTime').value) || 0;
+            const totalCars = parseFloat(document.getElementById('totalCars').value) || 0;
+            const avgService = parseFloat(document.getElementById('avgService').value) || 0;
+
+            if (obsTime <= 0 || avgService <= 0) return;
+
+            // 2. Core math calculations
+            const lambda = totalCars / obsTime;
+            const mu = 60 / avgService;
+            const rho = (lambda / mu) * 100;
+
+            // M/M/1 Wait Time formula: Wq = λ / (μ * (μ - λ))
+            let waitTime = 0;
+            if (rho < 100) {
+                waitTime = lambda / (mu * (mu - lambda));
+            }
+
+            // 3. Update text results
+            document.getElementById('lambda-res').innerText = lambda.toFixed(2);
+            document.getElementById('mu-res').innerText = mu.toFixed(2);
+            document.getElementById('rho-result').innerText = rho.toFixed(1) + '%';
+            document.getElementById('wait-res').innerText = rho >= 100 ? "Infinite" : waitTime.toFixed(1);
+
+            // Update warning banner
+            const banner = document.getElementById('status-banner');
+            banner.className = 'status-banner';
+            if (rho >= 100) {
+                banner.classList.add('status-danger');
+                banner.innerText = '🚨 CRASH: Severe Traffic Jam (Infinite Wait)';
+            } else if (rho >= 85) {
+                banner.classList.add('status-warning');
+                banner.innerText = '⚠️ HIGH RISK: Approaching Hockey Stick Spike';
+            } else {
+                banner.classList.add('status-safe');
+                banner.innerText = '✅ SAFE: System is Stable';
+            }
+
+            // 4. Update the chart
+            updateChart(mu, rho, waitTime);
+        }
+
+        function updateChart(mu, currentRho, currentWait) {
+            const curveData = [];
+            // Generate data points for the curve (from 10% to 95% utilization)
+            for (let r = 10; r <= 95; r += 2) {
+                let r_decimal = r / 100;
+                let test_lambda = r_decimal * mu;
+                let test_wait = test_lambda / (mu * (mu - test_lambda));
+                curveData.push({ x: r, y: test_wait });
+            }
+
+            // Data point for user's current status (The Blue Dot)
+            const currentPoint = [];
+            if (currentRho < 100) {
+                currentPoint.push({ x: currentRho, y: currentWait });
+            }
+
+            // Destroy old chart before drawing a new one
+            if (myChart != null) {
+                myChart.destroy();
+            }
+
+            const ctx = document.getElementById('hockeyStickChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Theoretical Wait Time (Hockey Stick Curve)',
+                            data: curveData,
+                            borderColor: 'rgba(234, 67, 53, 0.8)',
+                            backgroundColor: 'rgba(234, 67, 53, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            type: 'scatter',
+                            label: '📍 Your Current Status',
+                            data: currentPoint,
+                            backgroundColor: '#1a73e8',
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            pointRadius: 8,
+                            pointHoverRadius: 10,
+                            z: 10
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Utilization: ${context.parsed.x.toFixed(1)}% | Wait: ${context.parsed.y.toFixed(1)} mins`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'System Utilization ρ (%)', font: {size: 14, weight: 'bold'} },
+                            min: 0, max: 100,
+                            grid: { color: function(context) { return context.tick.value >= 85 ? 'rgba(251, 188, 4, 0.3)' : 'rgba(0,0,0,0.05)'; } }
+                        },
+                        y: {
+                            title: { display: true, text: 'Average Wait Time (Minutes)', font: {size: 14, weight: 'bold'} },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Run calculation when page loads
+        window.onload = calculate;
+    </script>
+</body>
+</html>

@@ -554,5 +554,82 @@ h1 {
 }
 
 
+/* --- 專案網格系統 (解決寬度變大問題) --- */
+.grid-container {
+    display: grid;
+    /* 使用 auto-fill 確保第二排項目不會強行伸展，並限制最大寬度為 1fr */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 30px;
+    margin-top: 40px;
+}
 
+/* --- 專案卡片標準化 (解決高度不齊問題) --- */
+.project-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 210, 255, 0.2);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    
+    /* 強制所有卡片總高度一致 */
+    height: 400px; 
+}
 
+/* --- 圖片/影片區域 --- */
+.project-thumb {
+    height: 200px;           /* 固定預覽圖高度 */
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background: #060b13;     
+    flex-shrink: 0;          /* 防止被內容擠壓變形 */
+}
+
+.project-thumb video, 
+.project-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;       /* 確保媒體內容完美填充不變形 */
+}
+
+/* --- 內容與文字截斷 --- */
+.project-info {
+    padding: 24px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    background: rgba(5, 10, 15, 0.7);
+}
+
+.project-info p {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    
+    /* 限制文字最多顯示 3 行，超出顯示省略號 */
+    display: -webkit-box;
+    -webkit-line-clamp: 3; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 4.8em; 
+}
+
+/* --- 標籤區域標準化 --- */
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+    
+    /* 固定標籤區高度，防止 T2 項目多標籤導致卡片撐開 */
+    height: 35px; 
+    overflow: hidden;
+    align-content: flex-start;
+}

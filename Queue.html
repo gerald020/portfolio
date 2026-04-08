@@ -3,59 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M/M/1 T2 Operations Dashboard</title>
+    <title>M/D/1 ✈️ T2 Single-Gate Capacity & Queue Prediction Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f0f2f5; 
+            background-color: #050a0f; /* 配合你個人網站的深色主題 */
+            color: #ffffff;
             display: flex; justify-content: center; align-items: center; 
             min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
         }
         .dashboard-container { 
-            background: white; padding: 30px; border-radius: 12px; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1); width: 100%; max-width: 800px;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 30px;
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 30px; border-radius: 16px; 
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px rgba(0, 210, 255, 0.1); 
+            width: 100%; max-width: 900px;
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px;
         }
         @media (max-width: 768px) {
             .dashboard-container { grid-template-columns: 1fr; }
         }
-        h2 { text-align: center; color: #1a73e8; margin-top: 0; grid-column: 1 / -1; }
+        h2 { 
+            text-align: center; color: #00d2ff; 
+            margin-top: 0; grid-column: 1 / -1; 
+            letter-spacing: 1px;
+        }
+        .subtitle {
+            text-align: center; color: #94a3b8; font-size: 14px;
+            grid-column: 1 / -1; margin-top: -15px; margin-bottom: 20px;
+        }
         .input-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #444; font-weight: 600; font-size: 14px; }
+        label { display: block; margin-bottom: 8px; color: #ccc; font-weight: 600; font-size: 14px; }
         input[type="number"] { 
-            width: 100%; padding: 12px; border: 2px solid #e0e0e0; 
+            width: 100%; padding: 12px; 
+            background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff;
             border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: 0.3s;
         }
-        input[type="number"]:focus { border-color: #1a73e8; outline: none; }
+        input[type="number"]:focus { border-color: #00d2ff; outline: none; box-shadow: 0 0 10px rgba(0,210,255,0.3); }
         .result-group { 
-            background: #f8f9fa; padding: 20px; border-radius: 8px; 
-            border-left: 6px solid #1a73e8; height: fit-content;
+            background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 12px; 
+            border-left: 4px solid #00d2ff; height: fit-content;
         }
         .result-item { 
-            display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #333; 
+            display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #ddd; 
+            align-items: center;
         }
-        .result-value { font-weight: bold; color: #1a73e8; }
+        .result-value { font-weight: bold; color: #00d2ff; font-size: 16px; }
+        .highlight-data { background: rgba(0, 210, 255, 0.1); padding: 5px 10px; border-radius: 5px; }
         #rho-result { font-size: 22px; }
         .status-banner { 
             text-align: center; padding: 12px; border-radius: 8px; 
-            font-weight: bold; margin-top: 20px; color: white; display: none; font-size: 16px;
+            font-weight: bold; margin-top: 20px; color: white; display: none; font-size: 15px;
+            letter-spacing: 1px;
         }
-        .status-safe { background-color: #34a853; display: block; }
-        .status-warning { background-color: #fbbc04; color: #333; display: block; }
-        .status-danger { background-color: #ea4335; display: block; }
+        .status-safe { background-color: rgba(52, 168, 83, 0.8); display: block; }
+        .status-warning { background-color: rgba(251, 188, 4, 0.8); color: #000; display: block; }
+        .status-danger { background-color: rgba(234, 67, 53, 0.8); display: block; }
         .chart-container {
-            grid-column: 1 / -1;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
+            grid-column: 1 / -1; margin-top: 10px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);
         }
     </style>
 </head>
 <body>
 
     <div class="dashboard-container">
-        <h2>✈️T2 Single-Gate Capacity & Queue Prediction Dashboard</h2>
+        <h2>✈️ T2 Single-Gate Capacity & Queue Prediction Dashboard</h2>
+        <div class="subtitle">Powered by M/D/1 Deterministic Queuing Theory</div>
 
         <div class="control-panel">
             <div class="input-group">
@@ -64,11 +79,11 @@
             </div>
             <div class="input-group">
                 <label>🚗 Total Cars Arrived</label>
-                <input type="number" id="totalCars" value="270" min="0" oninput="calculate()">
+                <input type="number" id="totalCars" value="300" min="0" oninput="calculate()">
             </div>
             <div class="input-group">
-                <label>⚙️ Avg Service Time per Car (Seconds)</label>
-                <input type="number" id="avgService" value="12" step="0.1" min="0.1" oninput="calculate()">
+                <label>⚙️ Avg Service Time per Car (Seconds/Car)</label>
+                <input type="number" id="avgService" value="10" step="0.1" min="0.1" oninput="calculate()">
             </div>
         </div>
 
@@ -76,109 +91,135 @@
             <div class="result-group">
                 <div class="result-item">
                     <span>Arrival Rate (λ):</span>
-                    <span class="result-value"><span id="lambda-res">4.50</span> cars/min</span>
+                    <span class="result-value"><span id="lambda-res">5.00</span> veh/min</span>
                 </div>
                 <div class="result-item">
                     <span>Service Rate (μ):</span>
-                    <span class="result-value"><span id="mu-res">5.00</span> cars/min</span>
+                    <span class="result-value"><span id="mu-res">6.00</span> veh/min</span>
                 </div>
-                <div class="result-item" style="border-top: 1px solid #dee2e6; padding-top: 12px; margin-top: 8px;">
+                <div class="result-item" style="border-top: 1px solid #444; padding-top: 12px; margin-top: 8px;">
                     <span>System Utilization (ρ):</span>
-                    <span class="result-value" id="rho-result">90.0%</span>
+                    <span class="result-value" id="rho-result">83.3%</span>
                 </div>
-                <div class="result-item">
-                    <span>Estimated Wait Time:</span>
-                    <span class="result-value" style="color:#ea4335"><span id="wait-res">9.0</span> mins</span>
+                <div class="result-item highlight-data">
+                    <span>Expected Queue (Lq):</span>
+                    <span class="result-value" style="color:#fbbc04"><span id="lq-res">2.1</span> cars</span>
+                </div>
+                <div class="result-item highlight-data">
+                    <span>Expected Wait (Wq):</span>
+                    <span class="result-value" style="color:#fbbc04"><span id="wait-res">0.4</span> mins</span>
                 </div>
             </div>
-            <div id="status-banner" class="status-banner status-warning">
-                ⚠️ HIGH RISK: Expect Long Queues
+            <div id="status-banner" class="status-banner status-safe">
+                ✅ SAFE: Traffic Flow is Stable
             </div>
         </div>
 
         <div class="chart-container">
-            <canvas id="hockeyStickChart"></canvas>
+            <canvas id="comparisonChart"></canvas>
         </div>
     </div>
 
     <script>
-        let myChart = null; // Store chart instance
+        let myChart = null;
 
         function calculate() {
-            // 1. Get input values
+            // 1. 讀取輸入數值
             const obsTime = parseFloat(document.getElementById('obsTime').value) || 0;
             const totalCars = parseFloat(document.getElementById('totalCars').value) || 0;
             const avgService = parseFloat(document.getElementById('avgService').value) || 0;
 
             if (obsTime <= 0 || avgService <= 0) return;
 
-            // 2. Core math calculations
+            // 2. 基礎參數計算
             const lambda = totalCars / obsTime;
             const mu = 60 / avgService;
-            const rho = (lambda / mu) * 100;
+            const rho = lambda / mu;
 
-            // M/M/1 Wait Time formula: Wq = λ / (μ * (μ - λ))
-            let waitTime = 0;
-            if (rho < 100) {
-                waitTime = lambda / (mu * (mu - lambda));
+            // 3. M/D/1 核心公式計算
+            let lq_md1 = 0;
+            let wq_md1 = 0;
+            
+            if (rho < 1) {
+                // M/D/1 隊列長度公式: Lq = (ρ^2) / (2 * (1 - ρ))
+                lq_md1 = (Math.pow(rho, 2)) / (2 * (1 - rho));
+                // M/D/1 等待時間公式: Wq = Lq / λ (Little's Law)
+                wq_md1 = lq_md1 / lambda;
             }
 
-            // 3. Update text results
+            // 4. 更新 UI 數字
             document.getElementById('lambda-res').innerText = lambda.toFixed(2);
             document.getElementById('mu-res').innerText = mu.toFixed(2);
-            document.getElementById('rho-result').innerText = rho.toFixed(1) + '%';
-            document.getElementById('wait-res').innerText = rho >= 100 ? "Infinite" : waitTime.toFixed(1);
+            document.getElementById('rho-result').innerText = (rho * 100).toFixed(1) + '%';
+            
+            document.getElementById('lq-res').innerText = rho >= 1 ? "Infinite" : lq_md1.toFixed(1);
+            document.getElementById('wait-res').innerText = rho >= 1 ? "Infinite" : wq_md1.toFixed(2);
 
-            // Update warning banner
+            // 5. 更新警告橫幅
             const banner = document.getElementById('status-banner');
             banner.className = 'status-banner';
-            if (rho >= 100) {
+            if (rho >= 1) {
                 banner.classList.add('status-danger');
-                banner.innerText = '🚨 CRASH: Severe Traffic Jam (Infinite Wait)';
-            } else if (rho >= 85) {
+                banner.innerText = '🚨 CRASH: System Overload (ρ ≥ 100%)';
+            } else if (rho >= 0.85) {
                 banner.classList.add('status-warning');
-                banner.innerText = '⚠️ HIGH RISK: Approaching Hockey Stick Spike';
+                banner.innerText = '⚠️ HIGH RISK: Approaching Capacity Limit';
             } else {
                 banner.classList.add('status-safe');
-                banner.innerText = '✅ SAFE: System is Stable';
+                banner.innerText = '✅ SAFE: Automated Flow is Optimal';
             }
 
-            // 4. Update the chart
-            updateChart(mu, rho, waitTime);
+            // 6. 更新對比圖表
+            updateChart(mu, rho * 100, lq_md1);
         }
 
-        function updateChart(mu, currentRho, currentWait) {
-            const curveData = [];
-            // Generate data points for the curve (from 10% to 95% utilization)
+        function updateChart(mu, currentRho, currentLq) {
+            const dataMM1 = [];
+            const dataMD1 = [];
+            
+            // 模擬 Utilization 從 10% 到 95% 的排隊長度變化
             for (let r = 10; r <= 95; r += 2) {
                 let r_decimal = r / 100;
-                let test_lambda = r_decimal * mu;
-                let test_wait = test_lambda / (mu * (mu - test_lambda));
-                curveData.push({ x: r, y: test_wait });
+                
+                // M/M/1 公式: Lq = ρ^2 / (1 - ρ)
+                let lq_mm1 = Math.pow(r_decimal, 2) / (1 - r_decimal);
+                // M/D/1 公式: Lq = ρ^2 / (2 * (1 - ρ))
+                let lq_md1 = Math.pow(r_decimal, 2) / (2 * (1 - r_decimal));
+
+                dataMM1.push({ x: r, y: lq_mm1 });
+                dataMD1.push({ x: r, y: lq_md1 });
             }
 
-            // Data point for user's current status (The Blue Dot)
+            // 用戶當前狀態點 (M/D/1)
             const currentPoint = [];
             if (currentRho < 100) {
-                currentPoint.push({ x: currentRho, y: currentWait });
+                currentPoint.push({ x: currentRho, y: currentLq });
             }
 
-            // Destroy old chart before drawing a new one
-            if (myChart != null) {
-                myChart.destroy();
-            }
+            if (myChart != null) { myChart.destroy(); }
 
-            const ctx = document.getElementById('hockeyStickChart').getContext('2d');
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
             myChart = new Chart(ctx, {
                 type: 'scatter',
                 data: {
                     datasets: [
                         {
                             type: 'line',
-                            label: 'Theoretical Wait Time (Hockey Stick Curve)',
-                            data: curveData,
-                            borderColor: 'rgba(234, 67, 53, 0.8)',
-                            backgroundColor: 'rgba(234, 67, 53, 0.1)',
+                            label: 'M/M/1 (Manual Gate) Lq',
+                            data: dataMM1,
+                            borderColor: 'rgba(234, 67, 53, 0.5)', /* 紅色半透明 */
+                            borderWidth: 2,
+                            borderDash: [5, 5], /* 虛線表示對照組 */
+                            fill: false,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            type: 'line',
+                            label: 'M/D/1 (Automated Gate) Lq',
+                            data: dataMD1,
+                            borderColor: '#00d2ff', /* 藍色實線 */
+                            backgroundColor: 'rgba(0, 210, 255, 0.1)',
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
@@ -188,7 +229,7 @@
                             type: 'scatter',
                             label: '📍 Your Current Status',
                             data: currentPoint,
-                            backgroundColor: '#1a73e8',
+                            backgroundColor: '#fbbc04',
                             borderColor: '#ffffff',
                             borderWidth: 2,
                             pointRadius: 8,
@@ -200,31 +241,40 @@
                 options: {
                     responsive: true,
                     interaction: { mode: 'index', intersect: false },
+                    color: '#ccc',
                     plugins: {
+                        title: {
+                            display: true,
+                            text: 'Queue Length Comparison: Automated vs Manual Gate',
+                            color: '#fff',
+                            font: { size: 16 }
+                        },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return `Utilization: ${context.parsed.x.toFixed(1)}% | Wait: ${context.parsed.y.toFixed(1)} mins`;
+                                    return `Utilization: ${context.parsed.x.toFixed(1)}% | Queue Length: ${context.parsed.y.toFixed(2)} cars`;
                                 }
                             }
                         }
                     },
                     scales: {
                         x: {
-                            title: { display: true, text: 'System Utilization ρ (%)', font: {size: 14, weight: 'bold'} },
+                            title: { display: true, text: 'System Utilization ρ (%)', color: '#94a3b8' },
                             min: 0, max: 100,
-                            grid: { color: function(context) { return context.tick.value >= 85 ? 'rgba(251, 188, 4, 0.3)' : 'rgba(0,0,0,0.05)'; } }
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8' }
                         },
                         y: {
-                            title: { display: true, text: 'Average Wait Time (Minutes)', font: {size: 14, weight: 'bold'} },
-                            beginAtZero: true
+                            title: { display: true, text: 'Expected Queue Length (Lq)', color: '#94a3b8' },
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8' }
                         }
                     }
                 }
             });
         }
 
-        // Run calculation when page loads
         window.onload = calculate;
     </script>
 </body>

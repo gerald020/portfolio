@@ -224,9 +224,9 @@
                     let distToTarget = Math.hypot(dx, dy);
 
                     // EXTREME CORNERING FRICTION: 
-                    // Wider zone (45px) and 80% speed penalty (currentSpeed = baseSpeed * 0.2)
+                    // Wider zone (45px) and 80% speed penalty (currentSpeed = baseSpeed * 0.7)
                     if (mode === 'zigzag' && distToTarget < 45 && this.waypointIndex < this.path.length - 2) {
-                        this.currentSpeed = this.baseSpeed * 0.2; 
+                        this.currentSpeed = this.baseSpeed * 0.7; 
                         this.isCornering = true;
                     }
 

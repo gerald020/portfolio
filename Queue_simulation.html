@@ -95,20 +95,20 @@
 <body>
 
     <div class="header">
-        <h1>Physics of Queueing & Extreme Cornering Friction</h1>
+        <h1>Physics of Queueing & Cornering Friction</h1>
         <p class="subtitle">Achieving "Zero Queue" through severe path-induced deceleration</p>
     </div>
 
     <div class="controls">
         <button id="btnOptionA" class="active">🔴 Option A: Straight Path (Full Speed)</button>
-        <button id="btnOptionB">🔵 Option B: Zigzag Path (Extreme Slowdown)</button>
+        <button id="btnOptionB">🔵 Option B: Snake-Shaped Path</button>
         <button id="btnRestart">🔄 Restart</button>
     </div>
 
     <div class="info-panel" id="infoPanel">
         <div class="info-text">
-            <h3 id="panelTitle" style="color: var(--danger-red);">Option A: Straight Path (Full Speed)</h3>
-            <p id="panelDesc">Passengers walk in a straight line at their <strong>maximum base speed</strong>. Without any physical obstacles or turns, the crowd maintains a high velocity, hitting the elevator bottleneck simultaneously and instantly exceeding the 26-person capacity.</p>
+            <h3 id="panelTitle" style="color: var(--danger-red);">Option A: Straight Path (Full Speed & Slow Cycle)</h3>
+            <p id="panelDesc">Passengers walk in a straight line at maximum base speed. The elevator needs to wait until it is fully loaded with 26 people before it can return. <strong>This long-term</strong> overload waiting state will cause a large number of passengers to be stranded.</p>
         </div>
         <div class="stats-box">
             <div class="stat-row"><span>Elevator Load:</span> <span class="stat-value" id="elLoad">0 / 26</span></div>
@@ -140,8 +140,7 @@
             timer: 0,
             capacity: 26,
             passengers: [],
-            awayDuration: 250, // Slightly increased to prove the extreme trickle works
-            doorWaitTime: 30   
+            doorWaitTime: 20 // 稍微縮短關門等待時間，讓節奏更緊湊
         };
         
         const pathStraight = [ {x: 50, y: 200}, {x: 690, y: 200} ];
@@ -223,10 +222,8 @@
                     let dy = target.y - this.y;
                     let distToTarget = Math.hypot(dx, dy);
 
-                    // EXTREME CORNERING FRICTION: 
-                    // Wider zone (45px) and 80% speed penalty (currentSpeed = baseSpeed * 0.7)
                     if (mode === 'zigzag' && distToTarget < 45 && this.waypointIndex < this.path.length - 2) {
-                        this.currentSpeed = this.baseSpeed * 0.7; 
+                        this.currentSpeed = this.baseSpeed * 0.2; 
                         this.isCornering = true;
                     }
 
@@ -267,7 +264,7 @@
 
         function initSimulation() {
             particles = [];
-            elevator = { state: 'OPEN', timer: 0, capacity: 26, passengers: [], awayDuration: 250, doorWaitTime: 30 };
+            elevator = { state: 'OPEN', timer: 0, capacity: 26, passengers: [], doorWaitTime: 20 };
             updateElevatorUI();
 
             const currentPath = mode === 'straight' ? pathStraight : pathZigzag;
@@ -359,7 +356,15 @@
                 }
                 if (allInside) {
                     let waitingLeft = particles.filter(p => p.state === 'queued').length;
-                    if (elevator.passengers.length >= elevator.capacity || waitingLeft === 0) {
+                    
+                    let shouldClose = false;
+                    if (mode === 'zigzag') {
+                        shouldClose = elevator.passengers.length > 0;
+                    } else {
+                        shouldClose = elevator.passengers.length >= elevator.capacity || waitingLeft === 0;
+                    }
+
+                    if (shouldClose) {
                         elevator.state = 'CLOSING';
                         elevator.timer = elevator.doorWaitTime;
                         updateElevatorUI();
@@ -373,7 +378,10 @@
                 elevator.timer--;
                 if (elevator.timer <= 0) {
                     elevator.state = 'AWAY';
-                    elevator.timer = elevator.awayDuration;
+                    
+                    // --- 核心修改：將 Option B 的運送時間設為 60 幀（約 1 秒） ---
+                    elevator.timer = (mode === 'zigzag') ? 60 : 250; 
+                    
                     elevator.passengers.forEach(p => p.state = 'processed');
                     updateElevatorUI();
                 }
@@ -402,7 +410,6 @@
             let queueLength = particles.filter(p => p.state === 'queued' || p.isBlocked).length;
             document.getElementById('queueCount').innerText = queueLength;
             
-            // Highlight text if there's no queue during Option B
             if(mode === 'zigzag') {
                 document.getElementById('queueCount').style.color = queueLength > 0 ? 'var(--warning-yellow)' : 'var(--safe-green)';
             } else {
@@ -417,8 +424,8 @@
             document.getElementById('btnOptionA').classList.add('active');
             document.getElementById('btnOptionB').classList.remove('active');
             document.getElementById('panelTitle').style.color = 'var(--danger-red)';
-            document.getElementById('panelTitle').innerHTML = 'Option A: Straight Path (Full Speed)';
-            document.getElementById('panelDesc').innerHTML = 'Passengers walk in a straight line at their <strong>maximum base speed</strong>. Without any physical obstacles or turns, the crowd maintains a high velocity, hitting the elevator bottleneck simultaneously and instantly exceeding the capacity.';
+            document.getElementById('panelTitle').innerHTML = 'Option A: Straight Path (Full Speed & Slow Cycle)';
+            document.getElementById('panelDesc').innerHTML = 'Passengers walk in a straight line at maximum base speed. This long-term overload waiting state will cause a large number of passengers to be stranded.';
             cancelAnimationFrame(animationId);
             initSimulation();
             animate();
@@ -429,8 +436,8 @@
             document.getElementById('btnOptionB').classList.add('active');
             document.getElementById('btnOptionA').classList.remove('active');
             document.getElementById('panelTitle').style.color = 'var(--accent-blue)';
-            document.getElementById('panelTitle').innerHTML = 'Option B: Zigzag Path (Extreme Slowdown / Zero Queue)';
-            document.getElementById('panelDesc').innerHTML = '<strong>Extreme Cornering Friction!</strong> The speed penalty at turns has been increased to an 80% reduction, over a wider radius. Watch as the massive purple slowdown zones physically shatter the platoon into a perfect trickle. The result? <strong>Virtually zero queue</strong> at the door.';
+            document.getElementById('panelTitle').innerHTML = 'Option B: Zigzag Path (1-Second Express)';
+            document.getElementById('panelDesc').innerHTML = '<strong>High-Frequency!</strong> A snake-shaped queue effectively absorbs sudden crowd surges and eases congestion. By keeping people moving in an orderly way, it greatly reduces the stress of waiting. <strong>returns almost instantly</strong>.';
             cancelAnimationFrame(animationId);
             initSimulation();
             animate();

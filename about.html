@@ -13,27 +13,70 @@
             font-family: 'Noto Sans TC', sans-serif;
             
             /* 2. 針對手機端：隱藏滾動條但保持滾動功能 (Firefox & IE) */
-            scrollbar-width: none;       /* Firefox */
-            -ms-overflow-style: none;    /* IE and Edge */
-            -webkit-overflow-scrolling: touch; /* 讓手機滑動順暢 */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* 3. 針對手機端：隱藏滾動條 (Chrome, Safari, iOS) */
         body::-webkit-scrollbar {
-            display: none; /* 隱藏右側滑條 */
+            display: none;
+        }
+
+        /* 4. 社群圖標容器樣式 */
+        .social-links {
+            margin-top: 20px; 
+            display: flex;
+            align-items: center;
+            gap: 25px; /* 這裡控制 Email 和 LinkedIn 圖標之間的距離 */
+        }
+
+        /* 5. 圖標基礎樣式與動畫過渡 */
+        .social-icon {
+            color: white; 
+            transition: color 0.3s ease, transform 0.3s ease; 
+            display: inline-flex;
+            text-decoration: none;
+        }
+
+        /* 6. LinkedIn 專屬懸停特效 (品牌藍) */
+        .icon-linkedin:hover {
+            color: #0077b5; 
+            transform: scale(1.15); 
+        }
+
+        /* 7. Email 專屬懸停特效 (Gmail 紅) */
+        .icon-email:hover {
+            color: #ea4335; 
+            transform: scale(1.15); 
         }
     </style>
 </head>
 <body class="fade-in">
-  
-
 
     <div class="subpage-container">
         <div class="glass-card about-content">
             <h1 class="section-title"> <span>About me</span></h1>
-             <p>✉Email: gerald.zgy@gmail.com</p>
+            
+            <div class="contact-info">
+                <div class="social-links">
+                    
+                    <a href="mailto:gerald.zgy@gmail.com" class="social-icon icon-email" aria-label="Email" title="發送郵件給 gerald.zgy@gmail.com">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="36" height="36" fill="currentColor">
+                            <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/>
+                        </svg>
+                    </a>
+
+                    <a href="https://www.linkedin.com/in/gerald-cheung/" target="_blank" class="social-icon icon-linkedin" aria-label="LinkedIn" title="Gerald Cheung | LinkedIn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="32" height="32" fill="currentColor">
+                            <path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/>
+                        </svg>
+                    </a>
+
+                </div>
+            </div>
+            
         </div>
     </div>
 </body>
-
 </html>

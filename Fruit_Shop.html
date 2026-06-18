@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerald — Premium Fruit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+/* ===== DESIGN TOKENS ===== */
+:root{
+  --bg:#FAF9F6;
+  --surface:#FFFFFF;
+  --fg:#1C1C1A;
+  --muted:#6B6B65;
+  --border:#E8E5DF;
+  --accent:#B87A4A;
+  --accent-glow:#D4A574;
+  --dark:#1A1A18;
+  --dark-surface:#252523;
+  --font-display:'Cormorant Garamond','Iowan Old Style','Times New Roman',serif;
+  --font-body:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  --radius:2px;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* ===== BASE ===== */
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--fg);
+  line-height:1.6;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* ===== NAVIGATION ===== */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:0 40px;height:72px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(250,249,246,0.85);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:0.5px solid transparent;
+  transition:border-color 0.4s var(--ease-out);
+}
+.nav.scrolled{border-bottom-color:var(--border)}
+.nav-logo{
+  font-family:var(--font-display);
+  font-size:1.5rem;font-weight:600;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--fg);
+}
+.nav-links{display:flex;gap:36px;list-style:none;align-items:center}
+.nav-links a{
+  font-size:0.8rem;font-weight:500;letter-spacing:0.06em;
+  text-transform:uppercase;color:var(--muted);
+  transition:color 0.3s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;
+  width:0;height:1px;background:var(--accent);
+  transition:width 0.3s var(--ease-out);
+}
+.nav-links a:hover{color:var(--fg)}
+.nav-links a:hover::after{width:100%}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px;z-index:1001}
+.hamburger span{
+  display:block;width:22px;height:1.5px;background:var(--fg);
+  margin:5px 0;transition:all 0.3s var(--ease-out);
+}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(4.5px,4.5px)}
+.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(4.5px,-4.5px)}
+
+/* Mobile menu */
+.mobile-menu{
+  position:fixed;inset:0;z-index:999;
+  background:rgba(250,249,246,0.97);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.4s var(--ease-out);
+}
+.mobile-menu.active{opacity:1;pointer-events:auto}
+.mobile-menu ul{list-style:none;text-align:center}
+.mobile-menu li{margin:24px 0}
+.mobile-menu a{
+  font-family:var(--font-display);
+  font-size:2rem;font-weight:500;letter-spacing:0.06em;
+  color:var(--fg);transition:color 0.3s;
+}
+.mobile-menu a:hover{color:var(--accent)}
+
+/* ===== HERO ===== */
+.hero{
+  position:relative;width:100%;min-height:100vh;
+  display:flex;align-items:center;
+  background:var(--dark);
+  overflow:hidden;
+}
+.hero-image{
+  position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover;
+  opacity:0.75;
+  filter:brightness(0.55) saturate(0.8);
+  animation:hero-zoom 8s var(--ease-out) forwards;
+}
+@keyframes hero-zoom{
+  from{transform:scale(1.08)}
+  to{transform:scale(1)}
+}
+.hero-vignette{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 65% 50%,transparent 30%,rgba(26,26,24,0.55) 70%);
+}
+.hero-content{
+  position:relative;z-index:2;
+  max-width:1200px;margin:0 auto;padding:120px 40px;
+  width:100%;
+}
+.hero-eyebrow{
+  font-size:0.75rem;font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--accent-glow);
+  margin-bottom:20px;
+}
+.hero-title{
+  font-family:var(--font-display);
+  font-size:clamp(2.8rem,6vw,5.5rem);
+  font-weight:500;line-height:1.08;letter-spacing:-0.01em;
+  color:#fff;max-width:680px;
+}
+.hero-title em{font-style:italic;font-weight:400}
+.hero-subtitle{
+  font-size:1.05rem;color:rgba(255,255,255,0.65);
+  margin-top:24px;max-width:440px;line-height:1.7;
+}
+.hero-cta{
+  display:inline-block;margin-top:36px;
+  font-size:0.8rem;font-weight:600;letter-spacing:0.1em;
+  text-transform:uppercase;color:#fff;
+  padding-bottom:6px;
+  border-bottom:1px solid rgba(255,255,255,0.35);
+  transition:all 0.3s var(--ease-out);
+}
+.hero-cta:hover{border-bottom-color:#fff;padding-bottom:10px}
+.hero-scroll{
+  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+  z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  color:rgba(255,255,255,0.4);
+  font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;
+}
+.hero-scroll-line{
+  width:1px;height:40px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0.4),transparent);
+  animation:scroll-pulse 2s ease-in-out infinite;
+}
+@keyframes scroll-pulse{
+  0%,100%{opacity:0.4;transform:scaleY(1)}
+  50%{opacity:1;transform:scaleY(1.3)}
+}
+
+/* ===== SECTIONS ===== */
+.section{
+  max-width:1200px;margin:0 auto;
+  padding:100px 40px;
+}
+.section-label{
+  display:inline-block;
+  font-size:0.65rem;font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:16px;
+}
+.section-title{
+  font-family:var(--font-display);
+  font-size:clamp(2rem,3.5vw,2.8rem);
+  font-weight:600;letter-spacing:-0.01em;
+  line-height:1.15;margin-bottom:12px;
+}
+.section-sub{
+  font-size:0.95rem;color:var(--muted);max-width:480px;
+  line-height:1.6;margin-bottom:56px;
+}
+
+/* ===== PRICE CHART ===== */
+.chart-list{
+  display:flex;flex-direction:column;gap:10px;
+  margin-bottom:48px;
+}
+.chart-row{
+  display:flex;align-items:center;gap:20px;
+}
+.chart-label{
+  flex:0 0 160px;text-align:right;
+  font-family:var(--font-display);
+  font-size:1.1rem;font-weight:500;font-style:italic;
+  color:var(--fg);
+}
+.chart-bar-wrap{
+  flex:1;min-width:0;
+  height:22px;background:var(--border);
+  border-radius:var(--radius);overflow:hidden;
+  position:relative;
+}
+.chart-bar{
+  height:100%;border-radius:var(--radius);
+  background:linear-gradient(90deg,var(--accent),var(--accent-glow));
+  display:flex;align-items:center;justify-content:flex-end;
+  padding-right:14px;
+  width:0;
+  transition:width 1s var(--ease-out) 0.3s;
+}
+.chart-bar.animated{width:var(--bar-width)}
+.chart-bar .price-tag{
+  font-size:0.75rem;font-weight:700;color:#fff;
+  white-space:nowrap;
+  letter-spacing:0.02em;
+}
+.chart-bar.durian{--bar-width:100%}
+.chart-bar.kiwi{--bar-width:71.4%}
+.chart-bar.mango{--bar-width:51.4%}
+.chart-bar.apple{--bar-width:34.3%}
+.chart-bar.banana{--bar-width:22.9%}
+.chart-unit{
+  flex:0 0 60px;
+  font-size:0.7rem;color:var(--muted);letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+
+/* ===== PRICE TABLE ===== */
+.price-table-wrap{
+  overflow-x:auto;
+  border:0.5px solid var(--border);
+  border-radius:var(--radius);
+}
+.price-table{
+  width:100%;border-collapse:collapse;
+  font-size:0.85rem;
+}
+.price-table thead{background:var(--surface)}
+.price-table th{
+  text-align:left;font-weight:600;font-size:0.65rem;
+  letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--muted);
+  padding:16px 20px;
+  border-bottom:0.5px solid var(--border);
+}
+.price-table td{
+  padding:16px 20px;
+  border-bottom:0.5px solid var(--border);
+  color:var(--fg);font-variant-numeric:tabular-nums;
+}
+.price-table tbody tr{transition:background 0.25s}
+.price-table tbody tr:hover{background:rgba(184,122,74,0.04)}
+.price-table .price-col{text-align:right;font-weight:600;letter-spacing:0.02em}
+.price-table .origin-col{color:var(--muted);font-style:italic}
+.price-table .grade-dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  margin-right:8px;vertical-align:middle;
+}
+.grade-dot.premium{background:var(--accent)}
+.grade-dot.select{background:#A09080}
+.grade-dot.organic{background:#8A9A6B}
+
+/* ===== PRODUCT CARDS ===== */
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:2px;
+  background:var(--border);
+}
+.card{
+  background:var(--surface);
+  position:relative;
+  transition:all 0.4s var(--ease-out);
+}
+.card:hover{z-index:10;box-shadow:0 20px 60px rgba(0,0,0,0.12)}
+.card-image-wrap{
+  position:relative;aspect-ratio:4/5;overflow:hidden;
+  background:var(--dark-surface);
+}
+.card-image{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform 0.7s var(--ease-out),opacity 0.5s;
+}
+.card:hover .card-image{transform:scale(1.04)}
+.card-image-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(26,26,24,0.35) 0%,transparent 40%);
+  opacity:0;transition:opacity 0.4s;
+}
+.card:hover .card-image-overlay{opacity:1}
+.card-body{padding:24px}
+.card-body h3{
+  font-family:var(--font-display);
+  font-size:1.3rem;font-weight:600;letter-spacing:0.02em;
+  margin-bottom:4px;
+}
+.card-origin{
+  font-size:0.8rem;color:var(--muted);font-style:italic;
+  margin-bottom:14px;
+}
+.card-price{
+  font-size:1.15rem;font-weight:700;color:var(--fg);
+  letter-spacing:0.02em;
+}
+.card-price small{font-weight:400;color:var(--muted);font-size:0.75rem}
+
+/* ===== FOOTER ===== */
+.footer{
+  border-top:0.5px solid var(--border);
+  padding:48px 40px;
+  text-align:center;
+}
+.footer-brand{
+  font-family:var(--font-display);
+  font-size:1.3rem;font-weight:600;letter-spacing:0.12em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.footer-info{
+  font-size:0.8rem;color:var(--muted);
+  line-height:1.8;
+}
+.footer-info a{color:var(--accent);transition:color 0.3s}
+.footer-info a:hover{color:var(--fg)}
+
+/* ===== SCROLL REVEAL ===== */
+.reveal{
+  opacity:0;transform:translateY(28px);
+  transition:opacity 0.8s var(--ease-out),transform 0.8s var(--ease-out);
+}
+.reveal.revealed{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.05s}
+.reveal-delay-2{transition-delay:0.12s}
+.reveal-delay-3{transition-delay:0.19s}
+.reveal-delay-4{transition-delay:0.26s}
+.reveal-delay-5{transition-delay:0.33s}
+
+/* ===== BUY NEW BUTTON (NEW) ===== */
+.buy-new-btn {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  background: var(--accent);
+  color: #fff;
+  padding: 16px 32px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px rgba(184, 122, 74, 0.4);
+  z-index: 9999;
+  transition: all 0.3s var(--ease-out);
+}
+.buy-new-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(184, 122, 74, 0.6);
+  color: #fff;
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+  .nav{padding:0 24px}
+  .section{padding:72px 24px}
+  .card-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  .chart-label{flex:0 0 120px;font-size:0.95rem}
+}
+@media(max-width:768px){
+  .nav-links{display:none}
+  .hamburger{display:block}
+  .hero-content{padding:100px 24px}
+  .section{padding:56px 20px}
+  .chart-row{flex-wrap:wrap;gap:8px}
+  .chart-label{flex:0 0 100%;text-align:left;font-size:0.95rem}
+  .chart-unit{display:none}
+  .chart-bar-wrap{flex:1 1 100%}
+  .card-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  .price-table th,.price-table td{padding:12px 14px;font-size:0.78rem}
+}
+@media(max-width:480px){
+  .nav{height:60px;padding:0 16px}
+  .nav-logo{font-size:1.2rem}
+  .hero-content{padding:80px 16px}
+  .hero-title{font-size:2.2rem}
+  .hero-scroll{display:none}
+  .section{padding:40px 16px}
+  .card-grid{grid-template-columns:1fr}
+  .card-image-wrap{aspect-ratio:3/2}
+  .price-table-wrap{border:none}
+  .price-table{font-size:0.75rem}
+  .chart-bar-wrap{height:18px}
+  .chart-bar .price-tag{font-size:0.7rem}
+  .buy-new-btn {
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 24px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .hero-image{animation:none}
+  .reveal{opacity:1;transform:none;transition:none}
+  .chart-bar{transition:none;width:var(--bar-width)}
+  .hero-scroll-line{animation:none}
+  .card-image{transition:none}
+  .card:hover .card-image{transform:none}
+  .buy-new-btn {transition: none;}
+  .buy-new-btn:hover {transform: none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
+  <a href="#" class="nav-logo" aria-label="Gerald Fruit Shop Home">Gerald Fruit Shop</a>
+  <ul class="nav-links">
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#collection">Collection</a></li>
+    <li><a href="#about">Our Story</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <ul>
+    <li><a href="#pricing" data-nav-close>Pricing</a></li>
+    <li><a href="#collection" data-nav-close>Collection</a></li>
+    <li><a href="#about" data-nav-close>Our Story</a></li>
+    <li><a href="#contact" data-nav-close>Contact</a></li>
+  </ul>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero" aria-label="Hero">
+  <img
+    class="hero-image"
+    src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=1600&q=85&fit=crop&auto=format"
+    alt="Premium fresh fruits on dark surface"
+    fetchpriority="high"
+    decoding="async"
+  >
+  <div class="hero-vignette" aria-hidden="true"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow reveal">Seasonal Collection · 2026</p>
+    <h1 class="hero-title reveal reveal-delay-1">
+      Fruit as it<br><em>should be</em>
+    </h1>
+    <p class="hero-subtitle reveal reveal-delay-2">
+      Direct from grower to your table. Each piece selected by hand,
+      delivered at peak ripeness.
+    </p>
+    <a href="#collection" class="hero-cta reveal reveal-delay-3">Explore the collection</a>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <span>Scroll</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<!-- ===== Customer Favorites & Trending Fruits ===== -->
+<section class="section" id="pricing" aria-labelledby="pricing-title">
+  <span class="section-label reveal">Popularity Index</span>
+  <h2 class="section-title reveal reveal-delay-1" id="pricing-title">Customer Favorites & Trending Fruits</h2>
+  <p class="section-sub reveal reveal-delay-1">
+Current collection ranked by popularity. The longer the bar, the more orders placed for that fruit. Check out our store's best-sellers.
+  </p>
+
+  <!-- Bar chart -->
+  <div class="chart-list reveal" role="img" aria-label="Popularity Index">
+    <div class="chart-row">
+      <span class="chart-label">Thailand Durian</span>
+      <div class="chart-bar-wrap"><div class="chart-bar durian"></div></div>
+      
+    </div>
+    <div class="chart-row">
+      <span class="chart-label">Gold Kiwi</span>
+      <div class="chart-bar-wrap"><div class="chart-bar kiwi"></div></div>
+      
+    </div>
+    <div class="chart-row">
+      <span class="chart-label">Taiwan Mango</span>
+      <div class="chart-bar-wrap"><div class="chart-bar mango"></div></div>
+      
+    </div>
+    <div class="chart-row">
+      <span class="chart-label">Fuji Apple</span>
+      <div class="chart-bar-wrap"><div class="chart-bar apple"></div></div>
+      
+    </div>
+    <div class="chart-row">
+      <span class="chart-label">Organic Banana</span>
+      <div class="chart-bar-wrap"><div class="chart-bar banana"></div></div>
+      
+    </div>
+  </div>
+
+  <!-- Data table -->
+  <div class="price-table-wrap reveal reveal-delay-2">
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Variety</th>
+          <th>Origin</th>
+          <th>Grade</th>
+          <th class="price-col">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Thailand Durian</td>
+          <td class="origin-col">Thailand · Monthong</td>
+          <td><span class="grade-dot premium" aria-hidden="true"></span>Premium</td>
+          <td class="price-col">HKD 350/KG</td>
+        </tr>
+        <tr>
+          <td>Gold Kiwi</td>
+          <td class="origin-col">New Zealand · Zespri</td>
+          <td><span class="grade-dot premium" aria-hidden="true"></span>Premium</td>
+          <td class="price-col">HKD 250/BOX</td>
+        </tr>
+        <tr>
+          <td>Taiwan Mango</td>
+          <td class="origin-col">Taiwan · Irwin</td>
+          <td><span class="grade-dot premium" aria-hidden="true"></span>Premium</td>
+          <td class="price-col">HKD 180/KG</td>
+        </tr>
+        <tr>
+          <td>Fuji Apple</td>
+          <td class="origin-col">Japan · Aomori</td>
+          <td><span class="grade-dot premium" aria-hidden="true"></span>Premium</td>
+          <td class="price-col">HKD 120/KG</td>
+        </tr>
+        <tr>
+          <td>Organic Banana</td>
+          <td class="origin-col">Taiwan · Certified Organic</td>
+          <td><span class="grade-dot premium" aria-hidden="true"></span>Premium</td>
+          <td class="price-col">HKD 80/KG</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== PRODUCT COLLECTION ===== -->
+<section class="section" id="collection" aria-labelledby="collection-title">
+  <span class="section-label reveal">This Week</span>
+  <h2 class="section-title reveal reveal-delay-1" id="collection-title">The Collection</h2>
+  <p class="section-sub reveal reveal-delay-1">
+    Five varieties at their peak. Each sourced from a single grower we trust.
+    Available while the harvest lasts.
+  </p>
+
+  <div class="card-grid">
+    <!-- Durian -->
+    <article class="card reveal reveal-delay-1">
+      <div class="card-image-wrap">
+        <img class="card-image" src="https://thethaiger.com/wp-content/uploads/2023/05/fresh-durian-durio-zibthinus-murray-sack-old-wood-background-king-fruit-from-thailand-summer-season.jpg" alt="Thailand Monthong Durian — whole fruit with spiky husk on dark background" loading="lazy" decoding="async">
+        <div class="card-image-overlay" aria-hidden="true"></div>
+      </div>
+      <div class="card-body">
+        <h3>Thailand Durian</h3>
+        <p class="card-origin">Monthong · Eastern Thailand</p>
+        <p class="card-price">HKD 350 <small>/ kg</small></p>
+      </div>
+    </article>
+
+    <!-- Gold Kiwi -->
+    <article class="card reveal reveal-delay-2">
+      <div class="card-image-wrap">
+        <img class="card-image" src="https://www.health.com/thmb/TcWXfboGoGohVDSDAi-ABwYmjoM=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Health-GettyImages-Repub-Kiwis-e89a7e08e2594b4dbb9c209ba0fbc67b.jpg" alt="New Zealand Zespri Gold Kiwi — sliced cross-section revealing golden flesh" loading="lazy" decoding="async">
+        <div class="card-image-overlay" aria-hidden="true"></div>
+      </div>
+      <div class="card-body">
+        <h3>Gold Kiwi</h3>
+        <p class="card-origin">Zespri · New Zealand</p>
+        <p class="card-price">HKD 250 <small>/ Box - 6 pieces</small></p>
+      </div>
+    </article>
+
+    <!-- Taiwan Mango -->
+    <article class="card reveal reveal-delay-3">
+      <div class="card-image-wrap">
+        <img class="card-image" src="https://www.frutasmontosa.com/en/wp-content/uploads/2018/02/benefits-mango.jpg" alt="Taiwan Irwin Mango — ripe golden-red mango on dark stone" loading="lazy" decoding="async">
+        <div class="card-image-overlay" aria-hidden="true"></div>
+      </div>
+      <div class="card-body">
+        <h3>Taiwan Mango</h3>
+        <p class="card-origin">Irwin · Tainan, Taiwan</p>
+        <p class="card-price">HKD 180 <small>/ kg</small></p>
+      </div>
+    </article>
+
+    <!-- Fuji Apple -->
+    <article class="card reveal reveal-delay-4">
+      <div class="card-image-wrap">
+        <img class="card-image" src="https://www.bbassets.com/media/uploads/p/l/40105380-3_2-fresho-apple-royal-gala-premium.jpg" alt="Japan Aomori Fuji Apple — deep red apple on dark wood surface" loading="lazy" decoding="async">
+        <div class="card-image-overlay" aria-hidden="true"></div>
+      </div>
+      <div class="card-body">
+        <h3>Fuji Apple</h3>
+        <p class="card-origin">Aomori · Japan</p>
+        <p class="card-price">HKD 120 <small>/ kg</small></p>
+      </div>
+    </article>
+
+    <!-- Organic Banana -->
+    <article class="card reveal reveal-delay-5">
+      <div class="card-image-wrap">
+        <img class="card-image" src="https://www.bbassets.com/media/uploads/p/l/10000027_32-fresho-banana-robusta.jpg" alt="Taiwan Certified Organic Banana — single yellow banana on dark textured background" loading="lazy" decoding="async">
+        <div class="card-image-overlay" aria-hidden="true"></div>
+      </div>
+      <div class="card-body">
+        <h3>Organic Banana</h3>
+        <p class="card-origin">Certified Organic · Taiwan</p>
+        <p class="card-price">HKD 80 <small>/ kg</small></p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer reveal" id="contact">
+  <div class="footer-brand">Gerald Fruit Shop</div>
+  <p class="footer-info">
+    Customer Care: <a href="tel:+85212345678">+852 1234 5678</a>
+    &nbsp;·&nbsp;
+    <a href="mailto:cheung.ai007@gmail.com">cheung.ai007@gmail.com</a>
+    &nbsp;·&nbsp;
+    Central Market, Hong Kong
+  </p>
+  <p class="footer-info" style="margin-top:4px;font-size:0.7rem;color:var(--muted)">
+    © 2026 Gerald Fruit Shop. All prices in HKD.
+  </p>
+</footer>
+
+<!-- ===== NEW BUY NEW BUTTON ===== -->
+<a href="mailto:cheung.ai007@gmail.com" class="buy-new-btn">Buy New</a>
+
+<script>
+/* ===== INTERSECTION OBSERVER — SCROLL REVEAL ===== */
+(function(){
+  var observerOptions = { threshold: 0.12, rootMargin: '0px 0px -30px 0px' };
+
+  var revealObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('revealed');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.reveal').forEach(function(el){
+    revealObserver.observe(el);
+  });
+
+  /* Chart bar animation */
+  var chartObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        document.querySelectorAll('.chart-bar').forEach(function(bar){
+          bar.classList.add('animated');
+        });
+        chartObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  var chartSection = document.querySelector('.chart-list');
+  if(chartSection) chartObserver.observe(chartSection);
+})();
+
+/* ===== NAVIGATION SCROLL EFFECT ===== */
+(function(){
+  var nav = document.getElementById('nav');
+  window.addEventListener('scroll', function(){
+    var currentScroll = window.pageYOffset;
+    if(currentScroll > 40){
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+  }, { passive: true });
+})();
+
+/* ===== MOBILE MENU ===== */
+(function(){
+  var hamburger = document.getElementById('hamburger');
+  var mobileMenu = document.getElementById('mobileMenu');
+  var navLinks = document.querySelectorAll('[data-nav-close]');
+  var isOpen = false;
+
+  function toggleMenu(){
+    isOpen = !isOpen;
+    hamburger.classList.toggle('active', isOpen);
+    mobileMenu.classList.toggle('active', isOpen);
+    hamburger.setAttribute('aria-expanded', isOpen);
+    mobileMenu.setAttribute('aria-hidden', !isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
+
+  hamburger.addEventListener('click', toggleMenu);
+
+  navLinks.forEach(function(link){
+    link.addEventListener('click', function(){
+      if(isOpen) toggleMenu();
+    });
+  });
+
+  /* Close on Escape */
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && isOpen) toggleMenu();
+  });
+})();
+</script>
+
+</body>
+</html>

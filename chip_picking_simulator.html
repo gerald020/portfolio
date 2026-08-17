@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronic Warehouse Picking SOP Logic Simulator</title>
+    <style>
+        :root {
+            --navy-950: #14243d;
+            --navy-800: #243d5e;
+            --navy-700: #31527b;
+            --slate-900: #243044;
+            --slate-700: #516178;
+            --slate-500: #8391a6;
+            --slate-300: #d8e0ea;
+            --slate-200: #e8edf3;
+            --slate-100: #f4f7fa;
+            --paper: #ffffff;
+            --red: #dc4b55;
+            --green: #2d9b66;
+            --yellow: #d49a13;
+            --success: #238253;
+            --danger: #c64049;
+            --warning: #b87600;
+            --shadow-card: 0 10px 24px rgba(28, 44, 71, 0.08), 0 2px 5px rgba(25, 44, 71, 0.05);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+            color: var(--slate-900);
+            background: linear-gradient(180deg, #eaf0f7 0, #f6f8fb 300px, #f4f7fa 100%);
+            margin: 0;
+            padding: 28px 24px 40px;
+            user-select: none;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1, h2 { color: var(--navy-950); }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.65rem, 2.4vw, 2.2rem);
+            line-height: 1.2;
+            letter-spacing: 0.02em;
+        }
+
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 38px 0 13px !important;
+            font-size: 1.08rem;
+            letter-spacing: 0.04em;
+            text-align: left;
+        }
+
+        h2::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--slate-300);
+        }
+
+        h2[style] { color: var(--navy-800) !important; }
+
+        .main-container > h1,
+        .main-container > .desc {
+            text-align: left;
+        }
+
+        .main-container > h1 {
+            padding: 26px 30px 0;
+            color: #ffffff;
+        }
+
+        .desc {
+            margin: 0 0 32px;
+            padding: 15px 30px 25px;
+            color: #dce8f7;
+            background: var(--navy-950);
+            border-radius: 0 0 16px 16px;
+            font-size: 0.96rem;
+            line-height: 1.8;
+            box-shadow: 0 10px 24px rgba(20, 36, 61, 0.18);
+        }
+
+        .desc strong {
+            display: inline-block;
+            margin-bottom: 3px;
+            color: #ffffff;
+            font-size: 1.03em;
+        }
+
+        /* Manufacturer inventory */
+        .upper-baskets,
+        .lower-baskets {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .upper-baskets { margin-bottom: 0; }
+
+        .basket,
+        .basket-order,
+        .wb-box {
+            min-width: 0;
+            background: var(--paper);
+            border: 1px solid var(--slate-300);
+            border-radius: 14px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .basket {
+            min-height: 194px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .basket-header {
+            margin-bottom: 10px;
+            padding: 10px 12px;
+            border-radius: 9px;
+            font-size: 0.98rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            text-align: center;
+        }
+
+        #red-basket .basket-header { color: #a92e39; background: #fff0f1; border: 1px solid #fac8cc; }
+        #green-basket .basket-header { color: #187446; background: #edfbf3; border: 1px solid #bfe8d0; }
+        #yellow-basket .basket-header { color: #8d6100; background: #fff8df; border: 1px solid #f1d58d; }
+
+        .basket-content {
+            display: flex;
+            flex: 1;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 9px;
+            padding: 11px;
+            border: 1px dashed #c7d2e0;
+            border-radius: 9px;
+            background: #fbfcfe;
+            transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .basket-content.over {
+            border-color: #5d87bb;
+            background-color: #edf5ff;
+            box-shadow: inset 0 0 0 2px rgba(69, 121, 181, 0.12);
+        }
+
+        /* Central workstations */
+        .workbenches-container {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            align-items: stretch;
+            margin-bottom: 0;
+            padding: 18px;
+            border: 2px dashed #9aaabd;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #eaf0f7, #f7f9fc);
+        }
+
+        .workbenches-container > p,
+        .lower-baskets > p {
+            grid-column: 1 / -1;
+            align-self: stretch;
+            margin: 0;
+            padding: 18px;
+            color: var(--slate-700);
+            background: rgba(255, 255, 255, 0.64);
+            border: 1px solid var(--slate-300);
+            border-radius: 11px;
+            font-size: 0.89rem;
+            line-height: 1.72;
+        }
+
+        .wb-box {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+        }
+
+        .wb-box:hover,
+        .basket:hover,
+        .basket-order:hover { transform: translateY(-2px); }
+
+        .wb-header {
+            padding: 13px 14px;
+            border-bottom: 1px solid var(--slate-200);
+            background: #fbfcfe;
+            font-size: 1rem;
+            font-weight: 750;
+            letter-spacing: 0.01em;
+            text-align: left;
+        }
+
+        .wb-info {
+            padding: 13px 14px;
+            border-bottom: 1px dashed #cfd9e5;
+            background: #f8fafc;
+            color: var(--slate-700);
+            font-size: 0.9rem;
+            line-height: 1.72;
+        }
+
+        .wb-info strong,
+        .wb-info span { font-weight: 750; }
+        .wb-info span { font-size: 1em; }
+
+        .workbench-content {
+            display: flex;
+            flex: 1;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 9px;
+            min-height: 152px;
+            padding: 13px;
+            background-color: #ffffff;
+            background-image: radial-gradient(#dce4ee 0.85px, transparent 0.85px);
+            background-size: 15px 15px;
+            transition: background-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .workbench-content.over {
+            background-color: #e2edf9;
+            box-shadow: inset 0 0 0 3px rgba(59, 110, 168, 0.24);
+        }
+
+        /* Draggable chip blocks */
+        .chip {
+            width: 34px;
+            height: 34px;
+            border: 1px solid rgba(20, 36, 61, 0.32);
+            border-radius: 8px;
+            cursor: grab;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            box-shadow: 0 3px 6px rgba(23, 40, 65, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+            transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chip:hover { filter: brightness(1.04); transform: translateY(-1px); }
+        .chip:active { cursor: grabbing; transform: scale(1.12); z-index: 10; box-shadow: 0 7px 14px rgba(23, 40, 65, 0.28); }
+        .chip-red { background: linear-gradient(145deg, #f66c73, var(--red)); border-color: #b93743; }
+        .chip-green { color: #063c22; background: linear-gradient(145deg, #75d59e, var(--green)); border-color: #197148; }
+        .chip-yellow { color: #624600; background: linear-gradient(145deg, #ffe27c, #e2ad23); border-color: #af7800; }
+
+        /* Customer order packing */
+        .lower-baskets {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            align-items: stretch;
+        }
+
+        .basket-order {
+            min-height: 382px;
+            padding: 17px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .order-logo {
+            width: 42px;
+            height: 42px;
+            border: 2px solid;
+            border-radius: 50%;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.16rem;
+            font-weight: 800;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            box-shadow: 0 2px 5px rgba(23, 40, 65, 0.1);
+        }
+
+        #order-A .order-logo { color: #bd3a44; border-color: #eaa3a9; background: #fff4f5; }
+        #order-B .order-logo { color: #285f9a; border-color: #a9c8e7; background: #f1f7ff; }
+        #order-C .order-logo { color: #9a6b00; border-color: #ead28b; background: #fff9e9; }
+
+        .order-title {
+            margin: 1px 56px 11px 0;
+            color: var(--navy-950);
+            font-size: 1.16rem;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .order-details {
+            margin-top: 0;
+            padding: 10px 12px;
+            border: 1px solid var(--slate-200);
+            border-radius: 9px;
+            background-color: #f8fafc;
+            font-size: 0.87rem;
+        }
+
+        .order-item {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 5px 8px;
+            align-items: center;
+            margin: 0;
+            padding: 6px 0;
+            border-bottom: 1px solid #e6ebf1;
+        }
+
+        .order-item:last-child { border-bottom: 0; }
+        .order-item span.label { width: auto; white-space: nowrap; }
+        .order-demand { color: var(--slate-700); white-space: nowrap; }
+        .order-item .status { padding: 2px 6px; border-radius: 999px; color: var(--slate-700); background: #e8edf3; font-weight: 800; white-space: nowrap; }
+        .status.ok { color: #0b603a; background: #d9f4e5; }
+        .status.error { color: #9f2730; background: #ffe0e3; }
+
+        .order-content {
+            display: flex;
+            flex: 1;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 9px;
+            min-height: 190px;
+            margin-top: 14px;
+            padding: 12px;
+            border: 2px dashed #b5c1d0;
+            border-radius: 10px;
+            background-color: #fafcff;
+            transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .order-content.over {
+            border-color: #477cb9;
+            background-color: #eaf4ff;
+            box-shadow: inset 0 0 0 2px rgba(71, 124, 185, 0.14);
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 32px 0 0 auto;
+            padding: 11px 20px;
+            border: 1px solid #38577f;
+            border-radius: 9px;
+            background: var(--navy-800);
+            color: #ffffff;
+            box-shadow: 0 5px 10px rgba(28, 53, 84, 0.18);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 750;
+            letter-spacing: 0.02em;
+            transition: transform 0.14s ease, background-color 0.14s ease, box-shadow 0.14s ease;
+        }
+
+        .reset-btn:hover { background-color: var(--navy-950); box-shadow: 0 7px 14px rgba(28, 53, 84, 0.23); transform: translateY(-1px); }
+        .reset-btn:focus-visible, .chip:focus-visible { outline: 3px solid #80b5ef; outline-offset: 3px; }
+
+        @media (max-width: 1120px) {
+            .workbenches-container,
+            .lower-baskets { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .workbenches-container > p,
+            .lower-baskets > p { grid-column: 1 / -1; }
+        }
+
+        @media (max-width: 760px) {
+            body { padding: 16px 14px 28px; }
+            .main-container > h1 { padding: 21px 20px 0; font-size: 1.5rem; }
+            .desc { padding: 13px 20px 21px; margin-bottom: 25px; font-size: 0.9rem; line-height: 1.7; }
+            h2 { margin-top: 28px !important; font-size: 1rem; }
+            .upper-baskets,
+            .workbenches-container,
+            .lower-baskets { grid-template-columns: 1fr; gap: 13px; }
+            .workbenches-container { padding: 13px; }
+            .workbenches-container > p,
+            .lower-baskets > p { grid-column: auto; }
+            .basket { min-height: 165px; }
+            .basket-order { min-height: 330px; }
+            .workbench-content { min-height: 130px; }
+            .order-content { min-height: 160px; }
+            .reset-btn { width: 100%; margin-top: 24px; }
+        }
+
+        @media (max-width: 430px) {
+            .order-item { grid-template-columns: 1fr auto; }
+            .order-demand { grid-column: 1 / -1; grid-row: 2; white-space: normal; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <h1>Electronic Warehouse Picking SOP Logic Simulator</h1>
+        <p class="desc">
+            <strong>[Mandatory Error-Proofing Workflow]</strong><br>
+            1. Drag each matching-color chip from the manufacturer inventory above to its dedicated workstation.<br>
+            2. The system unlocks only when the workstation's counted quantity reaches the total batch requirement (the status turns green).<br>
+            3. Once unlocked, distribute the chips from the workstation to the three customer orders below.
+        </p>
+        
+        <!-- Manufacturer inventory -->
+        <div class="upper-baskets">
+            <div class="basket" id="red-basket">
+                <div class="basket-header">SKU 1 (Red Manufacturer Inventory)</div>
+                <div class="basket-content" id="red-content"></div>
+            </div>
+            <div class="basket" id="green-basket">
+                <div class="basket-header">SKU 2 (Green Manufacturer Inventory)</div>
+                <div class="basket-content" id="green-content"></div>
+            </div>
+            <div class="basket" id="yellow-basket">
+                <div class="basket-header">SKU 3 (Yellow Manufacturer Inventory)</div>
+                <div class="basket-content" id="yellow-content"></div>
+            </div>
+        </div>
+
+        <!-- Central workstations -->
+        <h2 style="color:#455a64; margin-bottom:10px;">🛠️ Central Counting Workstations (Batch Picking Area)</h2>
+        <div class="workbenches-container">
+            <!-- Red workstation -->
+<p>List the total quantity required for each SKU, then complete the first counting check.<br>
+This workflow breaks complex work into a single-pass task.<br>
+</p>
+            <div class="wb-box" id="wb-box-red">
+                <div class="wb-header" style="color:#cc0000;">🔴 SKU 1 Workstation</div>
+                <div class="wb-info">
+                    Total batch requirement: <strong>14</strong> blocks (140 units)<br>
+                    Total counted: <span id="picked-red" style="color:blue;">0</span> blocks<br>
+                    Error-proofing status: <span id="wb-status-red" style="color:#ff9800;">⚠️ Insufficient quantity. Order distribution locked.</span>
+                </div>
+                <div class="workbench-content" id="workbench-red" data-color="red"></div>
+            </div>
+            <!-- Green workstation -->
+            <div class="wb-box" id="wb-box-green">
+                <div class="wb-header" style="color:#008800;">🟢 SKU 2 Workstation</div>
+                <div class="wb-info">
+                    Total batch requirement: <strong>20</strong> blocks (200 units)<br>
+                    Total counted: <span id="picked-green" style="color:blue;">0</span> blocks<br>
+                    Error-proofing status: <span id="wb-status-green" style="color:#ff9800;">⚠️ Insufficient quantity. Order distribution locked.</span>
+                </div>
+                <div class="workbench-content" id="workbench-green" data-color="green"></div>
+            </div>
+            <!-- Yellow workstation -->
+            <div class="wb-box" id="wb-box-yellow">
+                <div class="wb-header" style="color:#b8860b;">🟡 SKU 3 Workstation</div>
+                <div class="wb-info">
+                    Total batch requirement: <strong>6</strong> blocks (60 units)<br>
+                    Total counted: <span id="picked-yellow" style="color:blue;">0</span> blocks<br>
+                    Error-proofing status: <span id="wb-status-yellow" style="color:#ff9800;">⚠️ Insufficient quantity. Order distribution locked.</span>
+                </div>
+                <div class="workbench-content" id="workbench-yellow" data-color="yellow"></div>
+            </div>
+        </div>
+
+        <!-- Customer order packing -->
+        <h2 style="color:#455a64; margin-bottom:10px;">📦 Customer Order Packing Area (Sortation Area)</h2>
+        <div class="lower-baskets">
+
+            <!-- Order A -->
+<p>Pick SKU1 first in sequence, then clear it after sorting. The clear signal initiates a second check. If a quantity mismatch is found, only the SKU1 flow needs to be rechecked. Other SKUs remain unaffected.<br>
+
+Orders must be physically separated. After an order is completed and the workstation is cleared, 
+perform a third quantity check 
+and apply the corresponding order label. 
+</p>
+            <div class="basket-order" id="order-A">
+                <div class="order-logo">A</div>
+                <div class="order-title">Customer Order A</div>
+                <div class="order-details">
+                    <div class="order-item"><span class="label">🔴 SKU1:</span><span class="order-demand">Demand 50 units (5 blocks)</span><span class="status" id="status-a-red">0/5</span></div>
+                    <div class="order-item"><span class="label">🟢 SKU2:</span><span class="order-demand">Demand 70 units (7 blocks)</span><span class="status" id="status-a-green">0/7</span></div>
+                    <div class="order-item"><span class="label">🟡 SKU3:</span><span class="order-demand">Demand 10 units (1 block)</span><span class="status" id="status-a-yellow">0/1</span></div>
+                </div>
+                <div class="order-content" id="drop-A" data-target="A"></div>
+            </div>
+
+            <!-- Order B -->
+            <div class="basket-order" id="order-B">
+                <div class="order-logo">B</div>
+                <div class="order-title">Customer Order B</div>
+                <div class="order-details">
+                    <div class="order-item"><span class="label">🔴 SKU1:</span><span class="order-demand">Demand 70 units (7 blocks)</span><span class="status" id="status-b-red">0/7</span></div>
+                    <div class="order-item"><span class="label">🟢 SKU2:</span><span class="order-demand">Demand 90 units (9 blocks)</span><span class="status" id="status-b-green">0/9</span></div>
+                    <div class="order-item"><span class="label">🟡 SKU3:</span><span class="order-demand">Demand 30 units (3 blocks)</span><span class="status" id="status-b-yellow">0/3</span></div>
+                </div>
+                <div class="order-content" id="drop-B" data-target="B"></div>
+            </div>
+
+            <!-- Order C -->
+            <div class="basket-order" id="order-C">
+                <div class="order-logo">C</div>
+                <div class="order-title">Customer Order C</div>
+                <div class="order-details">
+                    <div class="order-item"><span class="label">🔴 SKU1:</span><span class="order-demand">Demand 20 units (2 blocks)</span><span class="status" id="status-c-red">0/2</span></div>
+                    <div class="order-item"><span class="label">🟢 SKU2:</span><span class="order-demand">Demand 40 units (4 blocks)</span><span class="status" id="status-c-green">0/4</span></div>
+                    <div class="order-item"><span class="label">🟡 SKU3:</span><span class="order-demand">Demand 20 units (2 blocks)</span><span class="status" id="status-c-yellow">0/2</span></div>
+                </div>
+                <div class="order-content" id="drop-C" data-target="C"></div>
+            </div>
+        </div>
+        
+        <button class="reset-btn" onclick="init()">Reset Simulation</button>
+    </div>
+
+    <script>
+        const config = {
+            red: { container: 'red-content', count: 18, class: 'chip-red', text: '10' },
+            green: { container: 'green-content', count: 25, class: 'chip-green', text: '10' },
+            yellow: { container: 'yellow-content', count: 10, class: 'chip-yellow', text: '10' }
+        };
+
+        const requirements = {
+            'A': { red: 5, green: 7, yellow: 1 },
+            'B': { red: 7, green: 9, yellow: 3 },
+            'C': { red: 2, green: 4, yellow: 2 }
+        };
+
+        // Calculate total demand by color
+        const totals = { red: 14, green: 20, yellow: 6 };
+
+        let draggedChip = null;
+
+        function init() {
+            // Clear all bins and workstations
+            ['red', 'green', 'yellow'].forEach(color => {
+                document.getElementById(`${color}-content`).innerHTML = '';
+                document.getElementById(`workbench-${color}`).innerHTML = '';
+            });
+            ['A', 'B', 'C'].forEach(order => {
+                document.getElementById(`drop-${order}`).innerHTML = '';
+            });
+
+            // Create chips
+            createChips('red');
+            createChips('green');
+            createChips('yellow');
+            
+            updateAllCounts();
+        }
+
+        function createChips(color) {
+            const container = document.getElementById(config[color].container);
+            for (let i = 0; i < config[color].count; i++) {
+                const chip = document.createElement('div');
+                chip.className = `chip ${config[color].class}`;
+                chip.draggable = true;
+                chip.id = `chip-${color}-${i}`;
+                chip.dataset.color = color;
+                chip.innerText = config[color].text;
+                
+                chip.addEventListener('dragstart', function(e) {
+                    draggedChip = this;
+                    e.dataTransfer.setData('text/plain', this.id);
+                    setTimeout(() => this.style.opacity = '0.5', 0);
+                });
+                chip.addEventListener('dragend', function() {
+                    this.style.opacity = '1';
+                    draggedChip = null;
+                });
+
+                container.appendChild(chip);
+            }
+        }
+
+        const dropZones = document.querySelectorAll('.order-content, .basket-content, .workbench-content');
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('over');
+            });
+            zone.addEventListener('dragleave', function() {
+                this.classList.remove('over');
+            });
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('over');
+                
+                if (!draggedChip) return;
+                
+                const chip = draggedChip;
+                const color = chip.dataset.color;
+                const sourceZone = chip.parentNode;
+                const targetZone = this;
+                const totalReq = totals[color];
+                
+                // Calculate the currently picked total (workstation + orders)
+                let inWorkbench = document.getElementById(`workbench-${color}`).querySelectorAll('.chip').length;
+                let inOrders = 0;
+                ['A', 'B', 'C'].forEach(order => {
+                    inOrders += document.getElementById(`drop-${order}`).querySelectorAll(`.chip-${color}`).length;
+                });
+                let totalPicked = inWorkbench + inOrders;
+                
+                // Core error-proofing logic
+                if (targetZone.classList.contains('basket-content')) {
+                    // Return to manufacturer inventory
+                    if (color !== targetZone.id.split('-')[0]) {
+                        alert("Error-proofing notice: Return the chip to its matching manufacturer inventory bin."); 
+                        return;
+                    }
+                } else if (targetZone.classList.contains('workbench-content')) {
+                    // Move to workstation
+                    if (color !== targetZone.dataset.color) {
+                        alert("Error-proofing notice: Color mismatch. Move the chip to the matching workstation."); 
+                        return;
+                    }
+                } else if (targetZone.classList.contains('order-content')) {
+                    // Move to order bin
+                    if (sourceZone.classList.contains('basket-content')) {
+                        alert("[Workflow error] You cannot pick directly from manufacturer inventory.\nMove the chip to its matching Central Counting Workstation first and complete the total count.");
+                        return;
+                    }
+                    
+                    if (totalPicked !== totalReq) {
+                        alert(`[Error-proofing lock] The count target has not been met.\nThe three orders require ${totalReq} ${color} chip blocks in total; only ${totalPicked} have been counted.\n\nComplete the exact quantity at the workstation before order distribution is unlocked.`);
+                        return;
+                    }
+                }
+                
+                targetZone.appendChild(chip);
+                updateAllCounts();
+            });
+        });
+
+        function updateAllCounts() {
+            // 1. Update workstation status
+            ['red', 'green', 'yellow'].forEach(color => {
+                let inWorkbench = document.getElementById(`workbench-${color}`).querySelectorAll('.chip').length;
+                let inOrders = 0;
+                ['A', 'B', 'C'].forEach(order => {
+                    inOrders += document.getElementById(`drop-${order}`).querySelectorAll(`.chip-${color}`).length;
+                });
+                
+                let totalPicked = inWorkbench + inOrders;
+                let req = totals[color];
+                
+                const pickedEl = document.getElementById(`picked-${color}`);
+                const statusEl = document.getElementById(`wb-status-${color}`);
+                const wbBox = document.getElementById(`wb-box-${color}`);
+                
+                pickedEl.innerText = totalPicked;
+                
+                if (totalPicked === req) {
+                    statusEl.innerHTML = "✅ Exact quantity. Order distribution unlocked.";
+                    statusEl.style.color = "#2e7d32";
+                    wbBox.style.borderColor = "#4caf50";
+                    wbBox.style.backgroundColor = "#f1f8e9";
+                } else if (totalPicked > req) {
+                    statusEl.innerHTML = "❌ Excess quantity. Return items to manufacturer inventory.";
+                    statusEl.style.color = "#d32f2f";
+                    wbBox.style.borderColor = "#f44336";
+                    wbBox.style.backgroundColor = "#ffebee";
+                } else {
+                    statusEl.innerHTML = "⚠️ Insufficient quantity. Order distribution locked.";
+                    statusEl.style.color = "#ff9800";
+                    wbBox.style.borderColor = "#ccc";
+                    wbBox.style.backgroundColor = "#fff";
+                }
+            });
+
+            // 2. Update order status
+            ['A', 'B', 'C'].forEach(order => {
+                const container = document.getElementById(`drop-${order}`);
+                const chips = container.querySelectorAll('.chip');
+                
+                let counts = { red: 0, green: 0, yellow: 0 };
+                chips.forEach(chip => {
+                    counts[chip.dataset.color]++;
+                });
+
+                ['red', 'green', 'yellow'].forEach(color => {
+                    const req = requirements[order][color];
+                    const current = counts[color];
+                    const statusEl = document.getElementById(`status-${order.toLowerCase()}-${color}`);
+                    
+                    statusEl.innerText = `${current}/${req}`;
+                    
+                    if (current === req) {
+                        statusEl.className = 'status ok';
+                    } else if (current > req) {
+                        statusEl.className = 'status error';
+                        statusEl.innerText += ' (Excess!)';
+                    } else {
+                        statusEl.className = 'status';
+                    }
+                });
+            });
+        }
+
+        // Start simulation
+        init();
+    </script>
+</body>
+</html>
